@@ -1138,4 +1138,128 @@
   }
 }
 
+.team-contacts-accordion {
+  margin-top: 2.5em;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 2em;
+}
 
+.accordion-btn {
+  background: #fff;
+  border: 1px solid #29608b;
+  color: #29608b;
+  border-radius: 10px;
+  font-size: 1.1em;
+  font-weight: 600;
+  padding: 0.7em 1.5em;
+  cursor: pointer;
+  margin-bottom: 1em;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+}
+.accordion-btn:hover,
+.accordion-btn.active {
+  background: #29608b;
+  color: #fff;
+}
+.accordion-arrow {
+  font-size: 1.1em;
+  margin-left: 0.6em;
+  transition: transform 0.3s;
+}
+.accordion-btn.active .accordion-arrow {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  margin-top: 1em;
+  animation: fadeIn 0.4s;
+}
+@keyframes fadeIn {
+  from { opacity: 0;}
+  to { opacity: 1;}
+}
+
+.contacts-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.8em;
+}
+
+.contact-card {
+  background: #f7fafd;
+  border-radius: 16px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+  padding: 1em 1.6em 1em 1em;
+  display: flex;
+  align-items: center;
+  width: 310px;
+  min-width: 230px;
+  margin-bottom: 0.8em;
+  min-height: 140px;
+  transition: box-shadow 0.2s;
+}
+.contact-card:hover {
+  box-shadow: 0 4px 24px rgba(41,96,139,0.10);
+}
+
+.contact-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;   /* или 0 если хочешь совсем квадратные */
+  object-fit: cover;
+  margin-right: 1.3em;
+  border: 2px solid #29608b22;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  background: #eaeaea;
+}
+
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.contact-name {
+  font-weight: 700;
+  font-size: 1.18em;
+  margin-bottom: 0.22em;
+}
+.contact-role {
+  font-size: 1.07em;
+  color: #345e7b;
+}
+
+@media (max-width: 900px) {
+  .contacts-cards {
+    gap: 1.1em;
+  }
+  .contact-card {
+    width: 100%;
+    max-width: 420px;
+    min-width: 0;
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 600px) {
+  .contacts-cards {
+    flex-direction: column;
+    gap: 0.8em;
+  }
+  .contact-card {
+    width: 100%;
+    max-width: 100%;
+    flex-direction: row;
+    padding: 0.7em 0.9em 0.7em 0.7em;
+    min-height: 100px;
+  }
+  .contact-photo {
+    width: 70px;
+    height: 70px;
+    margin-right: 0.9em;
+    border-radius: 10px;
+  }
+}
