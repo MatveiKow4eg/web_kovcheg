@@ -256,6 +256,11 @@ hr {
         <option value="5">День 5</option>
         <option value="6">День 6</option>
       </select>
+      <div class="danger-zone" id="deleteDayBlock">
+        <button type="button" id="deleteDayBtn">
+          <span class="icon-trash">🗑️</span>Удалить день
+        </button>
+      </div>
       <div id="fileUploadFields" style="display: none;">
         <input type="file" id="imageFile" accept="image/*" multiple required />
         <button type="submit">Загрузить</button>
@@ -283,6 +288,8 @@ hr {
     const deleteYearBtn = document.getElementById('deleteYearBtn');
     const deleteShiftBlock = document.getElementById('deleteShiftBlock');
     const deleteShiftBtn = document.getElementById('deleteShiftBtn');
+    const deleteDayBlock = document.getElementById('deleteDayBlock');
+    const deleteDayBtn = document.getElementById('deleteDayBtn');
 
     // Авторизация
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
@@ -306,6 +313,7 @@ hr {
       clearGallery();
       deleteYearBlock.style.display = yearSelect.value ? 'block' : 'none';
       deleteShiftBlock.style.display = 'none';
+      deleteDayBlock.style.display = 'none';
     });
 
     groupSelect.addEventListener('change', () => {
@@ -313,10 +321,12 @@ hr {
       fileUploadFields.style.display = 'none';
       clearGallery();
       deleteShiftBlock.style.display = (yearSelect.value && groupSelect.value) ? 'block' : 'none';
+      deleteDayBlock.style.display = 'none';
     });
 
     daySelect.addEventListener('change', () => {
       fileUploadFields.style.display = daySelect.value ? 'block' : 'none';
+      deleteDayBlock.style.display = (yearSelect.value && groupSelect.value && daySelect.value) ? 'block' : 'none';
       loadGallery();
     });
 
@@ -366,6 +376,44 @@ hr {
         .from('Kovcheg')
         .select('id')
         .eq('camp_shift', camp_shift);
+
+      if (error) {
+        alert('Ошибка загрузки данных');
+        return;
+      }
+      if (!data.length) {
+        alert('Нет фото для удаления');
+        return;
+      }
+
+      const idsToDelete = data.map(x => x.id);
+      const { error: delError } = await supabaseClient
+        .from('Kovcheg')
+        .delete()
+        .in('id', idsToDelete);
+
+      if (delError) {
+        alert('Ошибка удаления');
+      } else {
+        alert(`Удалено фотографий: ${idsToDelete.length}`);
+        clearGallery();
+      }
+    });
+
+    // Удалить конкретный день
+    deleteDayBtn.addEventListener('click', async () => {
+      const year = yearSelect.value;
+      const group = groupSelect.value;
+      const day = parseInt(daySelect.value);
+      if (!year || !group || !day) return;
+      const camp_shift = `${year}-${group}`;
+      if (!confirm(`Удалить все фотографии за ${camp_shift}, день ${day}? Это действие нельзя отменить!`)) return;
+
+      let { data, error } = await supabaseClient
+        .from('Kovcheg')
+        .select('id')
+        .eq('camp_shift', camp_shift)
+        .eq('day', day);
 
       if (error) {
         alert('Ошибка загрузки данных');
@@ -486,14 +534,16 @@ hr {
       await supabaseClient.from('Kovcheg').delete().eq('id', id);
       loadGallery();
     }
+    window.deleteImage = deleteImage;
+
     window.addEventListener('DOMContentLoaded', async () => {
-  // Проверка: если пользователь уже залогинен — показывай форму загрузки сразу
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (user) {
-    document.getElementById('uploadForm').style.display = 'block';
-    document.getElementById('loginForm').style.display = 'none';
-  }
-});
+      // Проверка: если пользователь уже залогинен — показывай форму загрузки сразу
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        document.getElementById('uploadForm').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
