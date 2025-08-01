@@ -93,3 +93,10 @@ document.querySelectorAll('.faq-question').forEach(btn => {
     });
   }
 });
+
+function toggleAccordionContacts(btn) {
+  const content = document.getElementById('accordionContacts');
+  const isOpen = content.style.display === 'block';
+  content.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('active', !isOpen);
+}
