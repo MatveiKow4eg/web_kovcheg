@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Темы лагеря | Ковчег</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style-index.css">
+  <link rel="stylesheet" href="style-theme.css">
+</head>
+<body>
+
+  <!-- Хедер -->
+<header class="main-header">
+  <div class="header-container">
+    <div class="main-logo">
+      <img src="index_img/logo/logo_black.png" alt="Ковчег" />
+    </div>
+    <nav class="main-nav">
+      <a href="index.html">Главная</a>
+      <a href="theme.html" class="active" >Тема</a>
+      <a href="about.html" >О лагере</a>
+      <a href="gallery.html">Галерея</a>
+      <a href="#" class="main-btn">Регистрация</a>
+    </nav>
+    <!-- Бургер-кнопка -->
+    <button class="burger" aria-label="Открыть меню">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header> 
+
+  <!-- ОБЁРТКА ДЛЯ КОНТЕНТА -->
+  <div class="main-shell">
+
+    <!-- Основной блок: 2025 и темы -->
+    <section class="theme-hero">
+      <h1 class="theme-hero-year">2025</h1>
+      <div class="theme-hero-cards">
+        <!-- Детская смена -->
+        <a href="theme/2025/madagascar2025.html" class="theme-card" style="background-image: url('theme_pictures/kids_2025.webp');">
+          <div class="theme-card-overlay">
+            <div class="theme-card-title">Детская смена</div>
+          </div>
+        </a>
+        <!-- Подростковая смена -->
+        <a href="#" class="theme-card" style="background-image: url('theme_pictures/teens_2025.jpg');">
+          <div class="theme-card-overlay">
+            <div class="theme-card-title">Подростковая смена</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Можешь добавить другие секции (если нужно), всё внутри main-shell -->
+
+  </div>
+
+  <!-- Футер -->
+  <footer class="site-footer">
+    <!-- Призыв к пожертвованию -->
+    <div class="donation-callout">
+      <h2 class="donation-title">
+        Помоги нам превратить маленькие шаги в большие перемены
+      </h2>
+      <p class="donation-text">
+        Твоё пожертвование поддерживает подростков и проекты, строящие лучшее будущее — шаг за шагом.
+      </p>
+      <a href="#donate" class="donation-button">Пожертвовать</a>
+    </div>
+
+    <!-- Основной блок футера -->
+    <div class="footer-container">
+      <div class="footer-brand">
+        <p class="brand-title">КОВЧЕГ</p>
+        <p class="brand-subtitle">Христианский лагерь<br>Меняем жизни подростков с 2009 года</p>
+      </div>
+
+      <div class="footer-links">
+        <h4>Навигация</h4>
+        <ul>
+          <li><a href="about.html">О лагере</a></li>
+          <li><a href="#program">Программа</a></li>
+          <li><a href="#team">Команда</a></li>
+          <li><a href="#gallery">Галерея</a></li>
+          <li><a href="#contact">Контакты</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-subscribe">
+        <h4>Будь в курсе новостей</h4>
+        <form>
+          <input type="email" placeholder="Твой email" required>
+          <button type="submit">Подписаться</button>
+        </form>
+        <p class="privacy-text">Подписываясь, ты соглашаешься с <a href="#">политикой конфиденциальности</a>.</p>
+      </div>
+    </div>
+
+    <!-- Низ футера -->
+    <div class="footer-bottom">
+      <p>&copy; 2025 Ковчег. Все права защищены.</p>
+    </div>
+  </footer>
+
+  <script src="js/camp-program.js"></script>
+</body>
+</html>

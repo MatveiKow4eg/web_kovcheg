@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>О лагере | Ковчег</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style-index.css">
+<link rel="stylesheet" href="style-about.css">
+</head>
+<body>
+<header class="main-header">
+  <div class="header-container">
+    <div class="main-logo">
+      <img src="index_img/logo/logo_black.png" alt="Ковчег" />
+    </div>
+    <nav class="main-nav">
+      <a href="index.html">Главная</a>
+      <a href="theme.html">Тема</a>
+      <a href="about.html" class="active">О лагере</a>
+      <a href="gallery.html">Галерея</a>
+      <a href="#" class="main-btn">Регистрация</a>
+    </nav>
+    <!-- Бургер-кнопка -->
+    <button class="burger" aria-label="Открыть меню">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header> 
+  <main>
+    <section class="about-sections">
+      <h1 class="about-title">О лагере</h1>
+      <button id="show-cards-btn" class="show-cards-btn">Показать разделы</button>
+      <div class="about-cards" id="about-cards" style="display:none;">
+        <!-- 1 -->
+        <div class="about-card" id="about">
+          <img src="about_img/about1.jpg" alt="О лагере">
+          <div class="about-card-content">
+            <h2>О лагере</h2>
+          </div>
+        </div>
+        <!-- 2 -->
+        <div class="about-card" id="unique">
+          <img src="about_img/unique.jpg" alt="Уникальность">
+          <div class="about-card-content">
+            <h2>Уникальность</h2>
+          </div>
+        </div>
+        <!-- 3 -->
+        <div class="about-card" id="living">
+          <img src="about_img/living.jpg" alt="Условия проживания">
+          <div class="about-card-content">
+            <h2>Условия проживания</h2>
+          </div>
+        </div>
+        <!-- 4 -->
+        <div class="about-card" id="location">
+          <img src="about_img/location.jpg" alt="Локация и даты">
+          <div class="about-card-content">
+            <h2>Локация и даты</h2>
+          </div>
+        </div>
+        <!-- 5 -->
+        <div class="about-card" id="history">
+          <img src="about_img/history.jpg" alt="История">
+          <div class="about-card-content">
+            <h2>История</h2>
+          </div>
+        </div>
+        <!-- 6 -->
+        <div class="about-card" id="team">
+          <img src="about_img/team.jpg" alt="Наша команда">
+          <div class="about-card-content">
+            <h2>Наша команда</h2>
+          </div>
+        </div>
+        <!-- 7 -->
+        <div class="about-card" id="reviews">
+          <img src="about_img/reviews.jpg" alt="Отзывы">
+          <div class="about-card-content">
+            <h2>Отзывы</h2>
+          </div>
+        </div>
+        <!-- 8 -->
+        <div class="about-card" id="faq">
+          <img src="about_img/faq.jpg" alt="FAQ">
+          <div class="about-card-content">
+            <h2>FAQ</h2>
+          </div>
+        </div>
+        <!-- 9 -->
+        <div class="about-card" id="contacts">
+          <img src="about_img/contacts.jpg" alt="Контакты">
+          <div class="about-card-content">
+            <h2>Контакты</h2>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="about-hero">
+  <div class="about-hero__text">
+    <h2>О лагере</h2>
+    <p class="about-hero__desc">
+      Лагерь «Ковчег» — это больше, чем просто отдых. Это место, где рождается дружба, формируются ценности и каждый может раскрыть свой потенциал в атмосфере любви и поддержки. 
+    </p>
+    <p class="about-hero__desc">
+      Уже более 15 лет мы собираем подростков и молодежь для настоящих приключений, новых знакомств и глубоких духовных переживаний.
+    </p>
+  </div>
+  <div class="about-hero__img-wrap">
+    <img src="about_img/imgabout/about.webp" alt="Лагерь Ковчег" class="about-hero__img" />
+  </div>
+</section>
+<section class="about-unique" id="unique">
+  <div class="unique-flex">
+    <!-- Фото слева, обычное -->
+    <div class="unique-photo">
+      <img src="about_img/imgabout/kirill.png" alt="Руководитель лагеря" />
+    </div>
+    <!-- Текст и карусель справа -->
+    <div class="unique-content">
+      <h2 class="unique-title">Уникальность наших лагерей</h2>
+      <p>
+        Каждый лагерь «Ковчег» — это не просто смена, а целое приключение с особой атмосферой и своим сценарием.
+      </p>
+      <p>
+        Каждый год мы выбираем новую тему, вокруг которой строится всё: оформление, задания, квесты, вечерние программы и даже блюда в столовой! Каждый день смены связан с сюжетом — участники становятся частью захватывающей истории: то отправляются в космическое путешествие, то оказываются на острове сокровищ, то становятся героями древней легенды.
+      </p>
+      <p>
+        Мы верим, что такой подход помогает ребятам по-настоящему погрузиться в процесс, раскрыть свои таланты, попробовать себя в новых ролях и получить незабываемые впечатления.
+      </p>
+      <p class="unique-years-title" style="margin-top: 1.2em; font-weight: 600;">
+        Темы наших лагерей с 2020 года:
+      </p>
+      <!-- Карусель тем по годам -->
+      <div class="themes-carousel-wrap">
+        <div class="themes-carousel" id="themesCarousel">
+          <div class="carousel-item">
+            <div class="carousel-year">2025</div>
+            <div class="carousel-title">«Путешествие героев»</div>
+            <div class="carousel-desc">Каждый день — новая глава, преодоление трудностей и раскрытие своих сильных сторон.</div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-year">2024</div>
+            <div class="carousel-title">«Космическая одиссея»</div>
+            <div class="carousel-desc">Исследование новых планет, творческие миссии, командные испытания.</div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-year">2023</div>
+            <div class="carousel-title">«Время чудес»</div>
+            <div class="carousel-desc">Атмосфера чудес, неожиданных открытий и вдохновения.</div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-year">2022</div>
+            <div class="carousel-title">«Острова дружбы»</div>
+            <div class="carousel-desc">Строительство команд, поиск кладов и развитие настоящей дружбы.</div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-year">2021</div>
+            <div class="carousel-title">«Мир будущего»</div>
+            <div class="carousel-desc">Технологии, изобретения и мечты о новом времени.</div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-year">2020</div>
+            <div class="carousel-title">«Сокровища Ковчега»</div>
+            <div class="carousel-desc">Поиски ценностей, раскрытие своих талантов и загадок прошлого.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="about-conditions" id="conditions">
+  <div class="conditions-flex">
+    <div class="conditions-content">
+      <h2 class="conditions-title">Условия проживания</h2>
+      <p>
+        В лагере «Ковчег» мы заботимся о комфорте и безопасности каждого участника. Проживание организовано в уютных комнатах с удобными кроватями и всем необходимым для комфортного отдыха.
+      </p>
+       <p>
+        Вся территория лагеря регулярно обрабатывается специальными средствами от насекомых — мы уделяем большое внимание защите и здоровью всех участников.
+      </p>
+      <p>
+        В каждом корпусе есть душевые и санузлы, а территория лагеря всегда чистая, зелёная и ухоженная. Внимательные вожатые и воспитатели всегда рядом, чтобы помочь и поддержать в любой ситуации.
+      </p>
+      <p>
+        На территории лагеря оборудованы спортивные площадки, зоны для творчества, места для отдыха и общения с друзьями.
+      </p>
+    </div>
+    <div class="conditions-photo">
+      <img src="about_img/imgabout/conditions-photo.png" alt="Условия проживания" />
+    </div>
+  </div>
+</section>
+
+
+<section class="about-location" id="location">
+  <h2 class="location-title">Локация и даты проведения</h2>
+  <div class="location-flex">
+    <!-- Детский лагерь -->
+    <div class="location-card">
+      <div class="calendar-visual">
+        <div class="calendar-month">Июль</div>
+        <div class="calendar-days">14–20</div>
+        <div class="calendar-year">2025</div>
+      </div>
+      <div class="calendar-caption">
+        <div class="location-label">Детский лагерь</div>
+        <div class="location-main"><b>14 — 20 июля 2025</b></div>
+      </div>
+    </div>
+    <!-- Подростковый лагерь -->
+    <div class="location-card">
+      <div class="calendar-visual">
+        <div class="calendar-month">Июль</div>
+        <div class="calendar-days">21–28</div>
+        <div class="calendar-year">2025</div>
+      </div>
+      <div class="calendar-caption">
+        <div class="location-label">Подростковый лагерь</div>
+        <div class="location-main"><b>21 — 28 июля 2025</b></div>
+      </div>
+    </div>
+    <!-- Локация с картой -->
+    <div class="location-card map-card">
+      <div class="mini-map-wrap">
+        <iframe
+          src="https://maps.google.com/maps?q=K%C3%BClluse%205%2C%20Luige%20alevik%2C%20Kiili%20vald&t=&z=15&ie=UTF8&iwloc=&output=embed"
+          width="100%" height="120" style="border:0; border-radius:12px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <div class="map-caption">
+        <div class="location-label">Локация</div>
+        <div class="location-main">
+          Harjumaa, Kiili vald,<br>
+          Luige alevik,<br>
+          ул. Кюллусе 5
+        </div>
+        <a href="https://maps.google.com/?q=Külluse 5, Luige alevik, Kiili vald" target="_blank" class="map-link">Открыть на карте</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="about-history" id="history">
+  <div class="history-flex">
+    <div class="history-photo">
+      <img src="about_img/imgabout/history.JPG" alt="История лагеря" />
+    </div>
+    <div class="history-content">
+      <h2 class="history-title">История лагеря</h2>
+      <p>
+        Лагерь «Ковчег» был основан в 2009 году с простой мечтой — создать пространство, где каждый подросток сможет раскрыть свои таланты, найти новых друзей и встретиться с Богом.
+      </p>
+      <p>
+        За годы существования лагерь прошёл путь от маленьких смен на природе до масштабного проекта, собирающего десятки ребят из разных городов. Каждый год мы продолжаем расти, создавать новые традиции, придумывать уникальные сценарии и делать всё, чтобы это лето стало для участников незабываемым!
+      </p>
+    </div>
+  </div>
+</section>
+
+
+
+<section class="about-team" id="team">
+  <div class="team-header">
+    <h2 class="team-title">Наша команда</h2>
+    <p class="team-subtitle">
+      Мы — команда наставников, вожатых и организаторов, которые искренне любят то, что делают. <br>
+      Каждый год мы вкладываем сердце, время и творчество, чтобы лагерь «Ковчег» стал для подростков настоящим событием!
+    </p>
+  </div>
+  <div class="team-grid">
+    <!-- 1 -->
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="about_img/imgabout/personal/mamapapa.jpg" alt="Мама и папа" class="team-photo" />
+      </div>
+      <div class="team-info">
+        <div class="team-name">Мама и Папа лагеря</div>
+        <div class="team-role">Руководители лагеря</div>
+      </div>
+    </div>
+    <!-- 2 -->
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="about_img/imgabout/personal/kirill.png" alt="Кирилл Карханин" class="team-photo" />
+      </div>
+      <div class="team-info">
+        <div class="team-name">Кирилл Карханин</div>
+        <div class="team-role">Сценарист . Kоординатор</div>
+      </div>
+    </div>
+    <!-- 3 -->
+    <div class="team-card">
+      <div class="team-photo-wrap"> 
+        <img src="about_img/imgabout/personal/matvei.jpg" alt="Матвей Чумичев" class="team-photo" />
+      </div>
+      <div class="team-info">
+        <div class="team-name">Матвей Чумичев</div>
+        <div class="team-role">Лидер медиа служения</div>
+      </div>
+    </div>
+    <!-- 4 -->
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="about_img/team/example3.jpg" alt="Павел Петров" class="team-photo" />
+      </div>
+      <div class="team-info">
+        <div class="team-name">Павел Петров</div>
+        <div class="team-role">Музыкальный лидер</div>
+      </div>
+    </div>
+    <!-- 5 -->
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="about_img/team/example3.jpg" alt="Павел Петров" class="team-photo" />
+      </div>
+      <div class="team-info">
+        <div class="team-name">Павел Петров</div>
+        <div class="team-role">Музыкальный лидер</div>
+      </div>
+    </div>
+    <!-- 6 -->
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="about_img/team/example3.jpg" alt="Павел Петров" class="team-photo" />
+      </div>
+      <div class="team-info">
+        <div class="team-name">Павел Петров</div>
+        <div class="team-role">Музыкальный лидер</div>
+      </div>
+    </div>
+    <!-- 7 -->
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="about_img/team/example3.jpg" alt="Павел Петров" class="team-photo" />
+      </div>
+      <div class="team-info">
+        <div class="team-name">Павел Петров</div>
+        <div class="team-role">Музыкальный лидер</div>
+      </div>
+    </div>
+    <!-- 8 -->
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img src="about_img/team/example3.jpg" alt="Павел Петров" class="team-photo" />
+      </div>
+      <div class="team-info">
+        <div class="team-name">Павел Петров</div>
+        <div class="team-role">Музыкальный лидер</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="about-reviews" id="reviews">
+  <div class="reviews-header">
+    <h2 class="reviews-title">Отзывы участников</h2>
+    <p class="reviews-subtitle">То, что люди говорят о лагере «Ковчег»</p>
+  </div>
+  <div class="reviews-masonry">
+    <div class="review-card">
+      <div class="review-text">
+        Этот лагерь, где дети встречаются с Богом. Получают много эмоций, отличная атмосфера и искренняя любовь к детям.
+      </div>
+      <div class="review-author">
+        — Мария, мама участника
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-text">
+        Самый добрый, интересный, полный весёлых игр и ярких событий!
+      </div>
+      <div class="review-author">
+        — Вика, 14 лет
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-text">
+        Атмосфера и Божие присутствие.
+      </div>
+      <div class="review-author">
+        — Никита, 17 лет
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-text">
+        Я был впервые, но уже хочу вернуться! Здесь можно по-настоящему раскрыться и найти новых друзей.
+      </div>
+      <div class="review-author">
+        — Данил, 16 лет
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-text">
+        Лагерь, который меняет жизнь. Спасибо всей команде за заботу и веру в каждого!
+      </div>
+      <div class="review-author">
+        — Елизавета, 15 лет
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-text">
+        Лучшие недели лета! Много новых впечатлений, поддержки и радости. Спасибо, «Ковчег»!
+      </div>
+      <div class="review-author">
+        — Иван, 13 лет
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-text">
+        Спасибо за искреннюю атмосферу, новые знания и возможность расти в вере!
+      </div>
+      <div class="review-author">
+        — Ксения, 16 лет
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-text">
+        Это место, где каждый чувствует себя частью большой семьи.
+      </div>
+      <div class="review-author">
+        — Матвей, 15 лет
+      </div>
+    </div>
+    <!-- Ещё отзывы по желанию -->
+  </div>
+</section>
+
+
+<section class="about-faq" id="faq">
+  <div class="faq-header">
+    <h2 class="faq-title">Часто задаваемые вопросы</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-question">Как записаться в лагерь?</button>
+      <div class="faq-answer">
+        Для записи просто нажмите кнопку «Регистрация» на сайте и заполните короткую форму. После этого с вами свяжется организатор.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Что брать с собой?</button>
+      <div class="faq-answer">
+        Обязательно возьмите Библию, одежду для активного отдыха, средства гигиены, удобную обувь, кружку и хорошее настроение!
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Можно ли приехать одному?</button>
+      <div class="faq-answer">
+        Конечно! В лагере быстро появляются новые друзья, и никто не остаётся один.
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Кто организаторы лагеря?</button>
+      <div class="faq-answer">
+        Команда наставников, вожатых и организаторов церкви, которые искренне любят детей и подростков и имеют большой опыт проведения лагерей.
+      </div>
+    </div>
+    <!-- Добавляй свои вопросы и ответы ниже -->
+  </div>
+</section>
+
+<section class="about-contacts" id="contacts">
+  <div class="contacts-inner">
+    <!-- Левая колонка -->
+    <div class="contacts-left">
+      <div class="contacts-info">
+        <div class="contact-item">
+          <span class="contact-icon">&#x1F4CD;</span>
+          Harjumaa, Kiili vald,<br>Luige alevik, ул. Кюллусе 5
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">&#x260E;</span>
+          +372 5123 4567<br>+372 5342 1190
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">&#x2709;</span>
+          camp.kovcheg@gmail.com
+        </div>
+        <div class="contact-item">
+          <span class="contact-icon">&#x1F4F1;</span>
+          @kovcheg_camp
+        </div>
+      </div>
+      <!-- Карта (Google maps или Яндекс карты, можно статичный скрин) -->
+      <div class="contacts-map">
+        <iframe src="https://www.google.com/maps?q=K%C3%BClluse+5,+Luige,+Kiili+vald,+Harjumaa,+Estonia&output=embed"
+          width="100%" height="170" style="border:0; border-radius: 12px;" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </div>
+    <!-- Правая колонка: форма -->
+    <div class="contacts-right">
+      <h3 class="contacts-title">Напишите нам</h3>
+      <p class="contacts-desc">Вы можете оставить нам сообщение — мы обязательно свяжемся с вами!</p>
+      <form class="contacts-form" autocomplete="off">
+        <input type="text" placeholder="Ваше имя" required>
+        <input type="email" placeholder="Ваш email" required>
+        <textarea placeholder="Ваше сообщение" required></textarea>
+        <button type="submit">Отправить</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+  <script src="js/about.js"></script>
+  <script src="js/camp-program.js"></script>
+</body>
+
+<footer class="site-footer">
+
+  <!-- Призыв к пожертвованию (в стиле Webflow) -->
+<div class="donation-callout">
+  <h2 class="donation-title">
+    Помоги нам превратить маленькие шаги в большие перемены
+  </h2>
+  <p class="donation-text">
+    Твоё пожертвование поддерживает подростков и проекты, строящие лучшее будущее — шаг за шагом.
+  </p>
+  <a href="#donate" class="donation-button">Пожертвовать</a>
+</div>
+  <!-- Основной блок футера -->
+  <div class="footer-container">
+    <div class="footer-brand">
+      <p class="brand-title">КОВЧЕГ</p>
+      <p class="brand-subtitle">Христианский лагерь<br>Меняем жизни подростков с 2009 года</p>
+    </div>
+
+    <div class="footer-links">
+      <h4>Навигация</h4>
+      <ul>
+        <li><a href="about.html">О лагере</a></li>
+        <li><a href="#program">Программа</a></li>
+        <li><a href="#team">Команда</a></li>
+        <li><a href="#gallery">Галерея</a></li>
+        <li><a href="#contact">Контакты</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-subscribe">
+      <h4>Будь в курсе новостей</h4>
+      <form>
+        <input type="email" placeholder="Твой email" required>
+        <button type="submit">Подписаться</button>
+      </form>
+      <p class="privacy-text">Подписываясь, ты соглашаешься с <a href="#">политикой конфиденциальности</a>.</p>
+    </div>
+  </div>
+
+  <!-- Низ футера -->
+  <div class="footer-bottom">
+    <p>&copy; 2025 Ковчег. Все права защищены.</p>
+  </div>
+
+</footer>
+</html>

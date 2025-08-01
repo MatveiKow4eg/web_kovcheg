@@ -1,0 +1,183 @@
+.program-section {
+  background: #fff;
+  border-radius: 34px;
+  box-shadow: 0 4px 32px 0 rgba(40,80,60,0.09);
+  padding: 56px 4vw 42px 4vw;
+  max-width: 1400px;
+  margin: 48px auto 40px auto;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.9rem;
+  font-weight: 900;
+  margin-bottom: 52px;
+  color: #10442e;
+  letter-spacing: 1.2px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.year-block {
+  margin-bottom: 58px;
+}
+
+.year-heading {
+  text-align: center;
+  font-size: 1.7rem;
+  margin: 0 0 32px 0;
+  font-weight: 850;
+  color: #1f784a;
+  letter-spacing: 0.7px;
+}
+
+.gallery-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 64px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.gallery-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f5f7fa;
+  border-radius: 30px;
+  box-shadow: 0 6px 32px rgba(55, 100, 85, 0.13);
+  transition: transform 0.15s, box-shadow 0.17s, background 0.18s;
+  width: 410px;
+  min-height: 420px;
+  padding: 34px 28px 24px 28px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+}
+
+.gallery-card:hover {
+  box-shadow: 0 16px 54px 0 rgba(35,77,59,0.17);
+  transform: translateY(-14px) scale(1.04);
+  background: #f0faf5;
+}
+
+.gallery-card img {
+  width: 100%;
+  height: 235px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin-bottom: 22px;
+  background: #e8ebee;
+  box-shadow: 0 4px 14px 0 rgba(70, 90, 60, 0.10);
+  border: none;
+  transition: box-shadow 0.17s;
+  display: block;
+}
+
+.card-caption {
+  padding: 16px 4px 0 4px;
+  background-color: transparent;
+}
+
+.card-caption h4 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  color: #133d28;
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+.card-caption p {
+  font-size: 1.13rem;
+  color: #55836d;
+  text-align: center;
+  margin: 0;
+  font-weight: 500;
+}
+
+@media (max-width: 1200px) {
+  .gallery-row {
+    gap: 32px;
+  }
+  .gallery-card {
+    width: 44vw;
+    min-width: 250px;
+    max-width: 500px;
+    padding: 22px 4vw 16px 4vw;
+  }
+  .gallery-card img {
+    height: 185px;
+  }
+}
+
+@media (max-width: 700px) {
+  .program-section {
+    padding: 15px 1vw 8px 1vw;
+    border-radius: 13px;
+    margin: 8px 1vw;
+  }
+  .section-title {
+    font-size: 1.65rem;
+    margin-bottom: 22px;
+  }
+  .year-heading {
+    font-size: 1.04rem;
+    margin-bottom: 15px;
+  }
+  .gallery-row {
+    flex-direction: column;
+    gap: 19px;
+    align-items: center;
+  }
+  .gallery-card {
+    width: 99vw;
+    min-width: 0;
+    max-width: 100vw;
+    padding: 12px 2vw;
+    min-height: 230px;
+  }
+  .gallery-card img {
+    height: 105px;
+    margin-bottom: 7px;
+  }
+  .card-caption h4 {
+    font-size: 1.04rem;
+    margin-bottom: 4px;
+  }
+  .card-caption p {
+    font-size: 0.95rem;
+  }
+}
+
+#deleteYearBlock, #deleteShiftBlock {
+  width: 100%;
+  margin-bottom: 8px;
+}
+#deleteYearBtn, #deleteShiftBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--danger);
+  color: #fff;
+  margin: 8px 0 0 0;
+  font-size: 1em;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 11px 0;
+  box-shadow: 0 1.5px 8px rgba(244,63,94,0.07);
+  border: none;
+  transition: background var(--transition);
+}
+#deleteYearBtn:hover, #deleteShiftBtn:hover {
+  background: var(--danger-dark);
+}
+.icon-trash {
+  font-size: 1.23em;
+  margin-right: 5px;
+}
+.divider {
+  border-bottom: 1px dashed #e5e7eb;
+  margin: 14px 0 6px 0;
+}
