@@ -686,14 +686,40 @@ body {
 }
 
 
+.carousel-track.dragging { cursor: grabbing; user-select: none; }
+.carousel-track { cursor: grab; }
+
+.swiper-slide {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+}
+
+.program-card {
+  min-width: 0;
+  max-width: 340px;
+  width: 100%;
+  box-sizing: border-box;
+}
 
 .carousel-wrapper {
   width: 100%;
   max-width: 100%;    
   margin: 0 auto 32px auto;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   position: relative;
+  -webkit-overflow-scrolling: touch; /* для плавного свайпа на iOS */
 }
+
+.carousel-wrapper::-webkit-scrollbar {
+  display: none;
+}
+.carousel-wrapper {
+  scrollbar-width: none; /* Firefox */
+}
+
 .carousel-track {
   display: flex;
   transition: transform 0.1s cubic-bezier(.55,0,.1,1);
@@ -719,11 +745,24 @@ body {
   .program-card { min-width: 260px; max-width: 260px; }
   .card-top { height: 170px; }
 }
-@media (max-width: 850px) {
-  .program-card { min-width: 92vw; max-width: 92vw; margin: 0 4vw; }
-  .card-top { height: 38vw; min-height: 150px; }
+@media (max-width: 900px) {
+  .swiper-slide {
+    width: 92vw !important;
+    min-width: 0 !important;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+  .program-card {
+    width: 100%;
+    max-width: 96vw;
+    min-width: 0;
+    margin: 0;
+  }
+  .card-top { height: 38vw; min-height: 120px; }
 }
-
 /* impact-section */ 
 
 .impact-section {

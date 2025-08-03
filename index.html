@@ -7,22 +7,19 @@
   <link rel="stylesheet" href="style-index.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;900&display=swap&subset=cyrillic" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 </head>
 <body>
 
-  <!-- 🔷 ОБВЁРТКА САЙТА -->
   <div class="main-shell">
 
-    <!-- 🔹 ХЕДЕР -->
+    <!-- ХЕДЕР -->
     <header class="main-header">
       <div class="header-container">
         <div class="main-logo">
           <img 
             src="optimized_img/index_img/logo/logo_black-40.webp"
-            srcset="
-              optimized_img/index_img/logo/logo_black-40.webp 40w,
-              optimized_img/index_img/logo/logo_black-80.webp 80w
-            "
+            srcset="optimized_img/index_img/logo/logo_black-40.webp 40w, optimized_img/index_img/logo/logo_black-80.webp 80w"
             alt="Ковчег"
           />
         </div>
@@ -39,16 +36,12 @@
       </div>
     </header>
 
-    <!-- 🔹 ХЕРО-БЛОК -->
+    <!-- ХЕРО-БЛОК -->
     <section class="hero-section">
       <div class="hero-img-wrap">
         <img 
           src="optimized_img/main-800.webp"
-          srcset="
-            optimized_img/main-400.webp 400w,
-            optimized_img/main-800.webp 800w,
-            optimized_img/main-1200.webp 1200w
-          "
+          srcset="optimized_img/main-400.webp 400w, optimized_img/main-800.webp 800w, optimized_img/main-1200.webp 1200w"
           sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
           alt="hero"
           class="hero-img"
@@ -62,7 +55,7 @@
       </div>
     </section>
 
-    <!-- 🔹 МИССИЯ -->
+    <!-- МИССИЯ -->
     <section class="mission-section">
       <div class="mission-inner">
         <div class="mission-label">наша миссия</div>
@@ -80,207 +73,177 @@
         </div>
       </div>
     </section>
+  </div> <!-- main-shell -->
 
-  </div> <!-- 🔚 main-shell -->
-
-  <!-- 🔹 ЧТО ЖДЁТ УЧАСТНИКОВ -->
+  <!-- ЧТО ЖДЁТ УЧАСТНИКОВ — SWIPER -->
   <section class="program-section">
     <h2 class="section-title">Что ждёт участников</h2>
-    <div class="carousel-wrapper">
-      <div class="carousel-track" id="carousel-track">
-
+    <div class="swiper mySwiper carousel-wrapper">
+      <div class="swiper-wrapper">
         <!-- Карточка 1 -->
-        <div class="program-card">
-          <div class="card-top">
-            <img 
-              src="optimized_img/index_img/praise-400.webp"
-              srcset="
-                optimized_img/index_img/praise-400.webp 400w,
-                optimized_img/index_img/praise-800.webp 800w
-              "
-              sizes="(max-width: 600px) 90vw, 400px"
-              alt="Вечера хвалы"
-              loading="lazy"
-            />
-            <div class="icon-bubble">
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
               <img 
-                src="optimized_img/index_img/icon/praise-40.webp"
-                srcset="
-                  optimized_img/index_img/icon/praise-40.webp 40w,
-                  optimized_img/index_img/icon/praise-80.webp 80w
-                "
-                sizes="40px"
-                alt="Иконка хвалы"
-                width="40" height="40"
+                src="optimized_img/index_img/praise-400.webp"
+                srcset="optimized_img/index_img/praise-400.webp 400w, optimized_img/index_img/praise-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Вечера хвалы"
                 loading="lazy"
               />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/praise-40.webp"
+                  srcset="optimized_img/index_img/icon/praise-40.webp 40w, optimized_img/index_img/icon/praise-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка хвалы"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Вечера хвалы</h3>
+              <p>Атмосферные вечера с живой музыкой, поклонением и молитвой, где каждый может встретиться с Богом.</p>
             </div>
           </div>
-          <div class="card-bottom">
-            <h3>Вечера хвалы</h3>
-            <p>Атмосферные вечера с живой музыкой, поклонением и молитвой, где каждый может встретиться с Богом.</p>
-          </div>
         </div>
-
         <!-- Карточка 2 -->
-        <div class="program-card">
-          <div class="card-top">
-            <img 
-              src="optimized_img/index_img/games-400.webp"
-              srcset="
-                optimized_img/index_img/games-400.webp 400w,
-                optimized_img/index_img/games-800.webp 800w
-              "
-              sizes="(max-width: 600px) 90vw, 400px"
-              alt="Тематические игры"
-              loading="lazy"
-            />
-            <div class="icon-bubble">
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
               <img 
-                src="optimized_img/index_img/icon/games-40.webp"
-                srcset="
-                  optimized_img/index_img/icon/games-40.webp 40w,
-                  optimized_img/index_img/icon/games-80.webp 80w
-                "
-                sizes="40px"
-                alt="Иконка игр"
-                width="40" height="40"
+                src="optimized_img/index_img/games-400.webp"
+                srcset="optimized_img/index_img/games-400.webp 400w, optimized_img/index_img/games-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Тематические игры"
                 loading="lazy"
               />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/games-40.webp"
+                  srcset="optimized_img/index_img/icon/games-40.webp 40w, optimized_img/index_img/icon/games-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка игр"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Тематические игры</h3>
+              <p>Захватывающие игры и квесты, связанные с темой лагеря — весело и глубоко одновременно.</p>
             </div>
           </div>
-          <div class="card-bottom">
-            <h3>Тематические игры</h3>
-            <p>Захватывающие игры и квесты, связанные с темой лагеря — весело и глубоко одновременно.</p>
-          </div>
         </div>
-
         <!-- Карточка 3 -->
-        <div class="program-card">
-          <div class="card-top">
-            <img 
-              src="optimized_img/index_img/theme-400.webp"
-              srcset="
-                optimized_img/index_img/theme-400.webp 400w,
-                optimized_img/index_img/theme-800.webp 800w
-              "
-              sizes="(max-width: 600px) 90vw, 400px"
-              alt="Тема лагеря"
-              loading="lazy"
-            />
-            <div class="icon-bubble">
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
               <img 
-                src="optimized_img/index_img/icon/star-40.webp"
-                srcset="
-                  optimized_img/index_img/icon/star-40.webp 40w,
-                  optimized_img/index_img/icon/star-80.webp 80w
-                "
-                sizes="40px"
-                alt="Иконка темы"
-                width="40" height="40"
+                src="optimized_img/index_img/theme-400.webp"
+                srcset="optimized_img/index_img/theme-400.webp 400w, optimized_img/index_img/theme-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Тема лагеря"
                 loading="lazy"
               />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/star-40.webp"
+                  srcset="optimized_img/index_img/icon/star-40.webp 40w, optimized_img/index_img/icon/star-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка темы"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Уникальная тема лагеря</h3>
+              <p>Каждый год — новая тема, которая пронизывает всю программу и помогает увидеть Бога в простом.</p>
             </div>
           </div>
-          <div class="card-bottom">
-            <h3>Уникальная тема лагеря</h3>
-            <p>Каждый год — новая тема, которая пронизывает всю программу и помогает увидеть Бога в простом.</p>
-          </div>
         </div>
-
         <!-- Карточка 4 -->
-        <div class="program-card">
-          <div class="card-top">
-            <img 
-              src="optimized_img/index_img/hobbies-400.webp"
-              srcset="
-                optimized_img/index_img/hobbies-400.webp 400w,
-                optimized_img/index_img/hobbies-800.webp 800w
-              "
-              sizes="(max-width: 600px) 90vw, 400px"
-              alt="Кружки"
-              loading="lazy"
-            />
-            <div class="icon-bubble">
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
               <img 
-                src="optimized_img/index_img/icon/brush-40.webp"
-                srcset="
-                  optimized_img/index_img/icon/brush-40.webp 40w,
-                  optimized_img/index_img/icon/brush-80.webp 80w
-                "
-                sizes="40px"
-                alt="Иконка кружков"
-                width="40" height="40"
+                src="optimized_img/index_img/hobbies-400.webp"
+                srcset="optimized_img/index_img/hobbies-400.webp 400w, optimized_img/index_img/hobbies-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Кружки"
                 loading="lazy"
               />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/brush-40.webp"
+                  srcset="optimized_img/index_img/icon/brush-40.webp 40w, optimized_img/index_img/icon/brush-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка кружков"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Кружки по интересам</h3>
+              <p>От театра и творчества до футбола и настолок — каждый найдёт своё любимое занятие.</p>
             </div>
           </div>
-          <div class="card-bottom">
-            <h3>Кружки по интересам</h3>
-            <p>От театра и творчества до футбола и настолок — каждый найдёт своё любимое занятие.</p>
-          </div>
         </div>
-
         <!-- Карточка 5 -->
-        <div class="program-card">
-          <div class="card-top">
-            <img src="index_img/food.jpg" alt="Еда" loading="lazy" />
-            <div class="icon-bubble">
-              <img 
-                src="optimized_img/index_img/icon/untesil-40.webp"
-                srcset="
-                  optimized_img/index_img/icon/untesil-40.webp 40w,
-                  optimized_img/index_img/icon/untesil-80.webp 80w
-                "
-                sizes="40px"
-                alt="Иконка еды"
-                width="40" height="40"
-                loading="lazy"
-              />
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
+              <img src="index_img/food.jpg" alt="Еда" loading="lazy" />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/untesil-40.webp"
+                  srcset="optimized_img/index_img/icon/untesil-40.webp 40w, optimized_img/index_img/icon/untesil-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка еды"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Вкусная еда</h3>
+              <p>Домашняя кухня, приготовленная с любовью. Вкусно, сытно, по-доброму!</p>
             </div>
           </div>
-          <div class="card-bottom">
-            <h3>Вкусная еда</h3>
-            <p>Домашняя кухня, приготовленная с любовью. Вкусно, сытно, по-доброму!</p>
-          </div>
         </div>
-
         <!-- Карточка 6 -->
-        <div class="program-card">
-          <div class="card-top">
-            <img 
-              src="optimized_img/index_img/mentoring-400.webp"
-              srcset="
-                optimized_img/index_img/mentoring-400.webp 400w,
-                optimized_img/index_img/mentoring-800.webp 800w
-              "
-              sizes="(max-width: 600px) 90vw, 400px"
-              alt="Наставничество"
-              loading="lazy"
-            />
-            <div class="icon-bubble">
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
               <img 
-                src="optimized_img/index_img/icon/heart-40.webp"
-                srcset="
-                  optimized_img/index_img/icon/heart-40.webp 40w,
-                  optimized_img/index_img/icon/heart-80.webp 80w
-                "
-                sizes="40px"
-                alt="Иконка наставничества"
-                width="40" height="40"
+                src="optimized_img/index_img/mentoring-400.webp"
+                srcset="optimized_img/index_img/mentoring-400.webp 400w, optimized_img/index_img/mentoring-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Наставничество"
                 loading="lazy"
               />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/heart-40.webp"
+                  srcset="optimized_img/index_img/icon/heart-40.webp 40w, optimized_img/index_img/icon/heart-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка наставничества"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Духовное наставничество</h3>
+              <p>Молитва, беседы и поддержка от наставников — путь к глубокому духовному росту.</p>
             </div>
           </div>
-          <div class="card-bottom">
-            <h3>Духовное наставничество</h3>
-            <p>Молитва, беседы и поддержка от наставников — путь к глубокому духовному росту.</p>
-          </div>
         </div>
-
       </div>
     </div>
-
     <div class="more-info-button-container">
       <a href="#подробнее" class="more-info-button">Подробнее</a>
     </div>
@@ -414,6 +377,10 @@
 
     </div>
   </section>
+ <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="js/swiper-init.js"></script>
+<script src="js/camp-program.js"></script>
+</body>
 
 </body>
 
@@ -459,6 +426,4 @@
   </div>
 </footer>
 
-<!-- 🔹 СКРИПТЫ -->
-<script src="js/camp-program.js"></script>
 </html>
