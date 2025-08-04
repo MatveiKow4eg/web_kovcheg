@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ковчег</title>
+  <link rel="stylesheet" href="style-index.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;900&display=swap&subset=cyrillic" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+</head>
+<body>
+
+  <div class="main-shell">
+
+    <!-- ХЕДЕР -->
+    <header class="main-header">
+      <div class="header-container">
+        <div class="main-logo">
+          <img 
+            src="optimized_img/index_img/logo/logo_black-40.webp"
+            srcset="optimized_img/index_img/logo/logo_black-40.webp 40w, optimized_img/index_img/logo/logo_black-80.webp 80w"
+            alt="Ковчег"
+          />
+        </div>
+        <nav class="main-nav">
+          <a href="index.html" class="active">Главная</a>
+          <a href="theme.html">Тема</a>
+          <a href="about.html">О лагере</a>
+          <a href="gallery.html">Галерея</a>
+          <a href="#" class="main-btn">Регистрация</a>
+        </nav>
+        <button class="burger" aria-label="Открыть меню">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ХЕРО-БЛОК -->
+    <section class="hero-section">
+      <div class="hero-img-wrap">
+        <img 
+          src="optimized_img/main-800.webp"
+          srcset="optimized_img/main-400.webp 400w, optimized_img/main-800.webp 800w, optimized_img/main-1200.webp 1200w"
+          sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
+          alt="hero"
+          class="hero-img"
+          fetchpriority="high"
+        />
+        <div class="hero-gradient"></div>
+        <h1 class="hero-title">Ковчег</h1>
+        <div class="hero-subtitle">
+          Христианский лагерь, который меняет жизни детей и подростков с 2007 года.
+        </div>
+      </div>
+    </section>
+
+    <!-- МИССИЯ -->
+    <section class="mission-section">
+      <div class="mission-inner">
+        <div class="mission-label">наша миссия</div>
+        <div class="mission-flex">
+          <h2 class="mission-title">
+            Мы помогаем подросткам обрести веру и новых друзей,<br />
+            раскрыть свои таланты,<br />
+            пережить настоящую встречу с Богом.<br />
+            <span class="mission-highlight">Каждый достоин этого!</span>
+          </h2>
+          <div class="mission-actions">
+            <a href="about.html" class="mission-btn">О лагере</a>
+            <a href="#register" class="mission-btn light">Регистрация</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div> <!-- main-shell -->
+
+  <!-- ЧТО ЖДЁТ УЧАСТНИКОВ — SWIPER -->
+  <section class="program-section">
+    <h2 class="section-title">Что ждёт участников</h2>
+    <div class="swiper mySwiper carousel-wrapper">
+      <div class="swiper-wrapper">
+        <!-- Карточка 1 -->
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
+              <img 
+                src="optimized_img/index_img/praise-400.webp"
+                srcset="optimized_img/index_img/praise-400.webp 400w, optimized_img/index_img/praise-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Вечера хвалы"
+                loading="lazy"
+              />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/praise-40.webp"
+                  srcset="optimized_img/index_img/icon/praise-40.webp 40w, optimized_img/index_img/icon/praise-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка хвалы"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Вечера хвалы</h3>
+              <p>Атмосферные вечера с живой музыкой, поклонением и молитвой, где каждый может встретиться с Богом.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Карточка 2 -->
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
+              <img 
+                src="optimized_img/index_img/games-400.webp"
+                srcset="optimized_img/index_img/games-400.webp 400w, optimized_img/index_img/games-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Тематические игры"
+                loading="lazy"
+              />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/games-40.webp"
+                  srcset="optimized_img/index_img/icon/games-40.webp 40w, optimized_img/index_img/icon/games-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка игр"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Тематические игры</h3>
+              <p>Захватывающие игры и квесты, связанные с темой лагеря — весело и глубоко одновременно.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Карточка 3 -->
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
+              <img 
+                src="optimized_img/index_img/theme-400.webp"
+                srcset="optimized_img/index_img/theme-400.webp 400w, optimized_img/index_img/theme-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Тема лагеря"
+                loading="lazy"
+              />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/star-40.webp"
+                  srcset="optimized_img/index_img/icon/star-40.webp 40w, optimized_img/index_img/icon/star-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка темы"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Уникальная тема лагеря</h3>
+              <p>Каждый год — новая тема, которая пронизывает всю программу и помогает увидеть Бога в простом.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Карточка 4 -->
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
+              <img 
+                src="optimized_img/index_img/hobbies-400.webp"
+                srcset="optimized_img/index_img/hobbies-400.webp 400w, optimized_img/index_img/hobbies-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Кружки"
+                loading="lazy"
+              />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/brush-40.webp"
+                  srcset="optimized_img/index_img/icon/brush-40.webp 40w, optimized_img/index_img/icon/brush-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка кружков"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Кружки по интересам</h3>
+              <p>От театра и творчества до футбола и настолок — каждый найдёт своё любимое занятие.</p>
+            </div>
+          </div>
+        </div>
+        <!-- Карточка 5 -->
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
+              <img src="index_img/food.jpg" alt="Еда" loading="lazy" />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/untesil-40.webp"
+                  srcset="optimized_img/index_img/icon/untesil-40.webp 40w, optimized_img/index_img/icon/untesil-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка еды"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Вкусная еда</h3>
+              <p>Домашняя кухня, приготовленная с любовью. Вкусно, сытно, по-доброму!</p>
+            </div>
+          </div>
+        </div>
+        <!-- Карточка 6 -->
+        <div class="swiper-slide">
+          <div class="program-card">
+            <div class="card-top">
+              <img 
+                src="optimized_img/index_img/mentoring-400.webp"
+                srcset="optimized_img/index_img/mentoring-400.webp 400w, optimized_img/index_img/mentoring-800.webp 800w"
+                sizes="(max-width: 600px) 90vw, 400px"
+                alt="Наставничество"
+                loading="lazy"
+              />
+              <div class="icon-bubble">
+                <img 
+                  src="optimized_img/index_img/icon/heart-40.webp"
+                  srcset="optimized_img/index_img/icon/heart-40.webp 40w, optimized_img/index_img/icon/heart-80.webp 80w"
+                  sizes="40px"
+                  alt="Иконка наставничества"
+                  width="40" height="40"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div class="card-bottom">
+              <h3>Духовное наставничество</h3>
+              <p>Молитва, беседы и поддержка от наставников — путь к глубокому духовному росту.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="more-info-button-container">
+      <a href="#подробнее" class="more-info-button">Подробнее</a>
+    </div>
+  </section>
+
+  <!-- 🔹 ВСТРЕЧА С БОГОМ -->
+  <section class="encounter-section">
+    <p class="section-label">Почему мы это делаем</p>
+    <h2 class="encounter-title">
+      Каждый момент — <span class="highlight-orange">для встречи с Богом</span>
+    </h2>
+    <div class="encounter-subblock">
+      <p class="encounter-intro">
+        <strong>Все эти активности</strong> — не просто весёлое времяпрепровождение. Мы делаем это, чтобы каждый участник лагеря:
+      </p>
+      <div class="encounter-points">
+        <div class="point">
+          <span class="point-number">1</span>
+          <p><strong>пережил живую встречу с Богом</strong></p>
+        </div>
+        <div class="point">
+          <span class="point-number">2</span>
+          <p><strong>почувствовал, как сильно Он любит</strong></p>
+        </div>
+        <div class="point">
+          <span class="point-number">3</span>
+          <p><strong>и как принимает каждого</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="influence-section">
+    <section class="scrolling-banner-wrapper">
+      <div class="scrolling-banner">
+        <div class="scrolling-track" id="scroll-track">
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Любовь</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Молитва</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Пробуждение</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Рост</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Дружба</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Слово</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Мир</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Свет</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Вера</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Единство</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Радость</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Истина</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Призвание</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Свобода</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Служение</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Надежда</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Спасение</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Объятия</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Поклонение</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Святость</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Благодать</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Семья</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Команда</span>
+          <span><img src="optimized_img/index_img/logo/logo_white-40.webp" alt="Лого"> Тепло</span>
+        </div>
+        <div class="scrolling-track clone" id="scroll-track-clone"></div>
+      </div>
+    </section>
+
+    <!-- 🔹 БЛОК ВЛИЯНИЯ -->
+    <section class="impact-section">
+      <div class="impact-header">
+        <div class="impact-title">
+          <h2>От тихих усилий — к реальным переменам:<br />как лагерь «Ковчег» влияет на детей и подростков</h2>
+        </div>
+        <div class="impact-text">
+          <p><strong>Каждое лето</strong> лагерь «Ковчег» в Эстонии становится местом, где дети и подростки не просто проводят время, а по-настоящему переживают встречу с Богом.</p>
+          <p>За последние смены здесь собрались участники со всей страны, десятки служителей, сотни часов поклонения, игр, общения, творчества и живой веры.</p>
+          <p><strong>С утра до вечера</strong> лагерь наполнен смыслом: от весёлых командных игр до серьёзных разговоров по душам, от костров и походов до молитвы и прославления.</p>
+          <p>Дети находят друзей, чувствуют, что они важны, любимы и приняты такими, какие есть.</p>
+          <p><strong>Каждый прожитый день</strong> здесь — это не просто отдых, а настоящая трансформация: духовная, эмоциональная и личная. Именно здесь ребёнок может впервые понять: <strong>Бог real</strong>, и Он рядом — в играх, песнях, молчании и смехе.</p>
+        </div>
+      </div>
+    </section>
+
+  </section>  
+
+  <section class="stats-section">
+    <div class="stats-grid styled-grid">
+
+      <!-- Большая вертикальная карточка -->
+      <div class="stats-card gradient-purple area-large">
+        <h4>Мы служим подросткам уже</h4>
+        <h2 class="count" data-target="19"><span class="number">0</span> <span class="unit">лет</span></h2>
+        <p>С 2007 года мы проводим лагеря, которые меняют жизни.</p>
+      </div>
+
+      <div class="stats-card photo-card area-img1">
+        <img 
+          src="optimized_img/index_img/stats-section/matvei-400.webp"
+          srcset="
+            optimized_img/index_img/stats-section/matvei-400.webp 400w,
+            optimized_img/index_img/stats-section/matvei-800.webp 800w
+          "
+          sizes="(max-width: 600px) 100vw, 400px"
+          alt="Общение в лагере"
+          loading="lazy"
+        >
+      </div>
+
+      <div class="stats-card gradient-blue area-kids">
+        <h4>Дети и подростки за лето</h4>
+        <h2 class="count" data-target="160"><span class="number">0</span><span class="unit">+</span></h2>
+        <p>Приезжают из разных уголков, чтобы найти Бога и друзей.</p>
+      </div>
+
+      <div class="stats-card gradient-orange area-staff">
+        <h4>Служители</h4>
+        <h2 class="count" data-target="60"><span class="number">0</span><span class="unit">+</span></h2>
+        <p>Отдают своё лето ради настоящего влияния на поколение.</p>
+      </div>
+
+      <div class="stats-card photo-card area-img2">
+        <img 
+          src="optimized_img/index_img/stats-section/kir-400.webp"
+          srcset="
+            optimized_img/index_img/stats-section/kir-400.webp 400w,
+            optimized_img/index_img/stats-section/kir-800.webp 800w
+          "
+          sizes="(max-width: 600px) 100vw, 400px"
+          alt="Прославление и молитва"
+          loading="lazy"
+        >
+      </div>
+
+    </div>
+  </section>
+ <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="js/swiper-init.js"></script>
+<script src="js/camp-program.js"></script>
+</body>
+
+</body>
+
+<footer class="site-footer">
+  <!-- Призыв к пожертвованию (в стиле Webflow) -->
+  <div class="donation-callout">
+    <h2 class="donation-title">
+      Помоги нам превратить маленькие шаги в большие перемены
+    </h2>
+    <p class="donation-text">
+      Твоё пожертвование поддерживает подростков и проекты, строящие лучшее будущее — шаг за шагом.
+    </p>
+    <a href="#donate" class="donation-button">Пожертвовать</a>
+  </div>
+  <!-- Основной блок футера -->
+  <div class="footer-container">
+    <div class="footer-brand">
+      <p class="brand-title">КОВЧЕГ</p>
+      <p class="brand-subtitle">Христианский лагерь<br>Меняем жизни подростков с 2009 года</p>
+    </div>
+    <div class="footer-links">
+      <h4>Навигация</h4>
+      <ul>
+        <li><a href="about.html">О лагере</a></li>
+        <li><a href="#program">Программа</a></li>
+        <li><a href="#team">Команда</a></li>
+        <li><a href="#gallery">Галерея</a></li>
+        <li><a href="#contact">Контакты</a></li>
+      </ul>
+    </div>
+    <div class="footer-subscribe">
+      <h4>Будь в курсе новостей</h4>
+      <form>
+        <input type="email" placeholder="Твой email" required>
+        <button type="submit">Подписаться</button>
+      </form>
+      <p class="privacy-text">Подписываясь, ты соглашаешься с <a href="#">политикой конфиденциальности</a>.</p>
+    </div>
+  </div>
+  <!-- Низ футера -->
+  <div class="footer-bottom">
+    <p>&copy; 2025 Ковчег. Все права защищены.</p>
+  </div>
+</footer>
+
+</html>

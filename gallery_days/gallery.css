@@ -1,0 +1,142 @@
+/* gallery.css */
+body {
+  background-color: #0e0e0e;
+  color: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #0e0e0e;
+  padding: 15px 20px;
+  border-bottom: 1px solid #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+h1 {
+  font-size: 22px;
+  margin: 0;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 15px;
+  font-size: 14px;
+  transition: opacity 0.2s ease;
+}
+
+nav a:hover {
+  opacity: 0.7;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  padding: 20px;
+}
+
+.gallery img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+  object-fit: cover;
+  background-color: #111; /* fallback фон на время загрузки */
+}
+
+.gallery img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 10px;
+  font-size: 22px;
+  color: #ccc;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.mobile-nav {
+  display: none;
+}
+
+#scrollTopBtn {
+  position: fixed;
+  bottom: 30px;
+  right: 20px;
+  background-color: #444;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+#scrollTopBtn:hover {
+  background-color: #666;
+}
+
+@media (max-width: 768px) {
+  nav#desktopNav {
+    display: none;
+  }
+
+  .mobile-nav {
+    display: block;
+    position: relative;
+  }
+
+  #menuToggle {
+    font-size: 22px;
+    background: none;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  #mobileMenu {
+    position: absolute;
+    background: #111;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #222;
+  }
+
+  #mobileMenu.hidden {
+    display: none;
+  }
+
+  #mobileMenu a {
+    padding: 10px;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid #222;
+  }
+
+  #mobileMenu a:hover {
+    background: #222;
+  }
+}
