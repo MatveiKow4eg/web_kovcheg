@@ -1,0 +1,132 @@
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background: #f7f8fa;
+  margin: 0;
+  padding: 0;
+}
+
+.donate-main {
+  max-width: 720px;
+  margin: 80px auto 40px auto;
+  padding: 0 18px;
+}
+
+.donate-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 38px;
+  color: #173b43;
+  letter-spacing: -1px;
+}
+
+.donate-bank-block {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px #2a9d8f10;
+  padding: 38px 24px 32px 24px;
+  margin: 0 auto 36px auto;
+  font-size: 1.27rem;
+  line-height: 1.7;
+  text-align: center;
+  max-width: 490px;
+}
+
+.donate-bank-text {
+  color: #163842;
+  font-size: 1.19em;
+  margin-bottom: 16px;
+}
+
+.donate-bank-reqs {
+  margin-bottom: 10px;
+}
+
+.donate-iban {
+  font-family: monospace;
+  font-size: 1.14em;
+  letter-spacing: 2px;
+  color: #2a9d8f;
+}
+
+.donate-bank-note {
+  margin-top: 14px;
+  color: #597a70;
+  font-size: 1.07rem;
+}
+
+.donate-bank-note a {
+  color: #ff7847;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.donate-bank-note a:hover {
+  color: #c83a16;
+}
+
+.donate-btn {
+  display: inline-block;
+  margin-top: 26px;
+  background: #193c43;
+  color: #fff;
+  padding: 13px 36px;
+  border-radius: 30px;
+  font-size: 1.18rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.18s;
+  box-shadow: 0 2px 14px #193c4330;
+}
+
+.donate-btn:hover {
+  background: #ff7847;
+  color: #fff;
+}
+
+.donate-why {
+  background: #fffefc;
+  border-radius: 20px;
+  box-shadow: 0 6px 24px #ffd4ba28;
+  padding: 100px 20px 28px 20px;
+  margin: 0 auto 26px auto;
+  max-width: 470px;
+  text-align: center;
+}
+
+.donate-why h2 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #193c43;
+  margin-bottom: 20px;
+}
+
+.donate-why ul {
+  text-align: left;
+  margin: 0 auto 18px auto;
+  padding-left: 1.2em;
+  font-size: 1.17rem;
+  color: #2b444a;
+  line-height: 1.55;
+}
+
+.donate-why li {
+  margin-bottom: 10px;
+}
+
+.donate-thanks {
+  color: #ff7847;
+  font-size: 1.16rem;
+  margin-top: 18px;
+  font-weight: 600;
+}
+
+/* Мобильный */
+@media (max-width: 650px) {
+  .donate-main { margin-top: 38px; }
+  .donate-title { font-size: 1.34rem; }
+  .donate-why h2 { font-size: 1.07rem; }
+  .donate-why ul { font-size: 1.05rem; }
+  .donate-bank-block { font-size: 1.04rem; padding: 22px 4vw 20px 4vw; }
+  .donate-btn { font-size: 1rem; padding: 12px 0; width: 100%; }
+}
