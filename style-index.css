@@ -542,6 +542,7 @@ font-size: clamp(1.5rem, 2.8vw, 2.8rem);
   font-size: 24px;
   color: #0b5d57;
   margin-bottom: 16px;
+  font-weight: 700;
 }
 
 .encounter-title {
