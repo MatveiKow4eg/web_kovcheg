@@ -772,6 +772,55 @@ font-size: clamp(1.5rem, 2.8vw, 2.8rem);
   }
   .card-top { height: 38vw; min-height: 120px; }
 }
+
+
+@media (max-width: 600px) {
+  .program-card .card-top {
+    height: 48vw;
+    min-height: 120px;  
+    max-height: 180px;
+  }
+.program-card .card-top img {
+    object-fit: cover;
+    object-position: center center; /* по центру по умолчанию */
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 10px;
+    display: block;
+  }
+
+    .program-card .card-top img[src*="theme-400"] {
+    object-position: center 20%;
+    /* подбери процент для лучшего результата, например, 40% или 50% */
+  }
+
+    .program-card .card-top img[src*="mentoring-400"] {
+    object-position: center 18%;
+  }
+
+
+  .program-card .icon-bubble {
+    bottom: 10px;
+    left: 10px;
+    width: 44px;
+    height: 44px;
+  }
+  .program-card .icon-bubble img {
+    width: 24px;
+    height: 24px;
+  }
+  .program-card {
+    min-width: 94vw;
+    max-width: 94vw;
+    margin: 0 3vw;
+    border-radius: 12px;
+  }
+  .program-card .card-bottom {
+    padding: 12px 10px 12px 10px;
+  }
+}
+
 /* impact-section */ 
 
 .impact-section {
@@ -1225,6 +1274,39 @@ background: linear-gradient(125deg, rgba(213, 195, 219, 1) 0%, rgba(175, 181, 21
   }
 
   /* Программа */
+
+@media (max-width: 600px) {
+  .card-top {
+    height: 48vw;
+    min-height: 120px;
+    max-height: 180px;
+  }
+  .card-top img {
+    object-fit: contain;
+    background: #fff;
+  }
+  .icon-bubble {
+    bottom: 10px;
+    left: 10px;
+    width: 44px;
+    height: 44px;
+  }
+  .icon-bubble img {
+    width: 24px;
+    height: 24px;
+  }
+  .program-card {
+    min-width: 94vw;
+    max-width: 94vw;
+    margin: 0 3vw;
+    border-radius: 12px;
+  }
+  .card-bottom {
+    padding: 12px 10px 12px 10px;
+  }
+}
+
+  
   .program-section {
     padding: 36px 0 24px 0;
     border-radius: 14px;
@@ -1233,10 +1315,6 @@ background: linear-gradient(125deg, rgba(213, 195, 219, 1) 0%, rgba(175, 181, 21
   .section-title {
     font-size: 1.15rem;
     margin-bottom: 18px;
-  }
-  .card-top {
-    height: 38vw;
-    min-height: 120px;
   }
   .card-bottom {
     padding: 15px 14px 14px 14px;

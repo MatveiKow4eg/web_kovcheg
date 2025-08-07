@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <title>Темы лагеря | Ковчег</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Favicon для разных браузеров -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+<link rel="icon" type="image/x-icon" href="favicon_io/favicon.ico">
+
+<!-- Для iOS устройств (Apple Touch Icon) -->
+<link rel="apple-touch-icon" href="favicon_io/apple-touch-icon.png">
+
+<!-- Для Android Chrome (Web App Manifest) -->
+<link rel="manifest" href="favicon_io/site.webmanifest">
   <link rel="stylesheet" href="style-index.css">
   <link rel="stylesheet" href="style-theme.css">
 </head>
@@ -34,32 +44,52 @@
   </div>
 </header> 
 
-  <!-- ОБЁРТКА ДЛЯ КОНТЕНТА -->
-  <div class="main-shell">
+<!-- ОБЁРТКА ДЛЯ КОНТЕНТА -->
+<div class="main-shell">
 
-    <!-- Основной блок: 2025 и темы -->
-    <section class="theme-hero">
-      <h1 class="theme-hero-year">2025</h1>
-      <div class="theme-hero-cards">
-        <!-- Детская смена -->
-<a href="theme/2025/madagascar2025.html" class="theme-card"
-   style="background-image: url('optimized_img/theme_pictures/kids_2025-400.webp');">
-  <div class="theme-card-overlay">
-    <div class="theme-card-title">Детская смена</div>
-  </div>
-</a>
-<a href="#" class="theme-card"
-   style="background-image: url('theme_pictures/teens_2025.jpg');">
-  <div class="theme-card-overlay">
-    <div class="theme-card-title">Подростковая смена</div>
-  </div>
-</a>
+  <!-- Секции по годам -->
+  <section class="year-block">
+    <h2 class="year-title">2025</h2>
+    <div class="theme-split-screen">
+      <div class="split left" style="background-image: url('optimized_img/theme_pictures/kids_2025-400.webp');">
+        <div class="overlay"></div>
+        <div class="content">
+          <h2>Детская смена</h2>
+          <a href="theme/2025/madagascar2025.html" class="theme-button">Подробнее</a>
+        </div>
       </div>
-    </section>
+      <div class="split right" style="background-image: url('theme_pictures/teens_2025.jpg');">
+        <div class="overlay"></div>
+        <div class="content">
+          <h2>Подростковая смена</h2>
+          <a href="#" class="theme-button">Подробнее</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <!-- Можно добавить другие секции -->
+  <section class="year-block">
+    <h2 class="year-title">2024</h2>
+    <div class="theme-split-screen">
+      <div class="split left" style="background-image: url('theme_pictures/kids_2024.jpg');">
+        <div class="overlay"></div>
+        <div class="content">
+          <h2>Детская смена</h2>
+          <a href="#" class="theme-button">Подробнее</a>
+        </div>
+      </div>
+      <div class="split right" style="background-image: url('theme_pictures/teens_2024.jpg');">
+        <div class="overlay"></div>
+        <div class="content">
+          <h2>Подростковая смена</h2>
+          <a href="#" class="theme-button">Подробнее</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  </div>
+  <!-- Повтори такой же блок для 2023, 2022, 2021, 2020 -->
+</div>
 
   <!-- Футер -->
 <footer class="site-footer">
