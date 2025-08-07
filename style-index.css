@@ -608,7 +608,15 @@ font-size: clamp(1.5rem, 2.8vw, 2.8rem);
 .point p {
   margin: 0;
   font-weight: 600;
+  white-space: nowrap;
 }
+
+@media (max-width: 650px) {
+  .point p, .nowrap {
+    white-space: normal !important;
+  }
+}
+
 
 @keyframes fadeInUp {
   to {
