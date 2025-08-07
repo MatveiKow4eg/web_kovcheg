@@ -308,7 +308,7 @@ body {
 
 .mission-title {
   font-family: 'Inter', Arial, sans-serif;
-  font-size: clamp(2rem, 3.2vw, 3.5rem);
+font-size: clamp(1.5rem, 2.8vw, 2.8rem);
   font-weight: 900;
   color: #1a3c43;
   margin: 0 0 28px 0;
