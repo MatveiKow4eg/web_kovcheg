@@ -17,6 +17,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;900&display=swap&subset=cyrillic" rel="stylesheet" />
 
   <style>
+    /* mobile: сначала пояснение, потом логин */
+@media (max-width: 650px) {
+  .auth-wrap {
+    display: flex;           /* вместо grid на мобилке */
+    flex-direction: column;  /* один столбец */
+    gap: 12px;
+  }
+  .auth-note { order: -1; }  /* перемещаем пояснение вверх */
+}
+
     /* ---------- AUTH PAGE TWEAKS ---------- */
     body { background: #f7f8fa; }
     .auth-hero {
