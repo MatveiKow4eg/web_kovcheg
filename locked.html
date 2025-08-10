@@ -146,18 +146,24 @@
   </div>
 </header>
 
-  <!-- Hero блок под стиль сайта -->
-  <section class="auth-hero">
-    <div class="auth-hero-wrap">
-      <img class="auth-hero-img" src="main.webp"
-           srcset="optimized_img/main-400.webp 400w, optimized_img/main-800.webp 800w, optimized_img/main-1200.webp 1200w"
-           sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
-           alt="Ковчег">
-      <div class="auth-hero-gradient"></div>
-      <h1 class="auth-title">Ковчег</h1>
-      <p class="auth-subtitle">Эта страница сейчас в разработке. Команда может войти ниже, чтобы продолжить работу.</p>
+
+<section class="hero-section">
+  <div class="hero-img-wrap">
+    <img 
+      src="main.webp"
+      srcset="optimized_img/main-400.webp 400w, optimized_img/main-800.webp 800w, optimized_img/main-1200.webp 1200w"
+      sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
+      alt="Ковчег"
+      class="hero-img"
+      fetchpriority="high"
+    />
+    <div class="hero-gradient"></div>
+    <h1 class="hero-title">Ковчег</h1>
+    <div class="hero-subtitle">
+      Эта страница сейчас в разработке. Команда может войти ниже, чтобы продолжить работу.
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- Контент: форма входа + блок-объяснение -->
   <main class="auth-wrap">
