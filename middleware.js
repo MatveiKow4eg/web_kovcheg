@@ -1,48 +1,54 @@
 // middleware.js
-
 export const config = {
-  matcher: [
-    '/theme.html',
-    '/admin/:path*',
-    '/draft/:path*',
-    '/theme-edit',
-    '/secret'
-  ],
+  // какие пути защищаем и служебный обработчик логина
+  matcher: ['/theme.html', '/_auth'],
 };
 
-export default function middleware(request) {
+export default async function middleware(request) {
+  const url = new URL(request.url);
   const USER = process.env.BASIC_AUTH_USER;
   const PASS = process.env.BASIC_AUTH_PASS;
 
+  // если env не заданы — просто отдадим страницу логина
   if (!USER || !PASS) {
-    return new Response('Auth not configured', { status: 500 });
+    return Response.redirect(new URL('/locked.html', url), 302);
   }
 
-  const auth = request.headers.get('authorization');
-  if (!auth) {
-    return new Response('Auth required', {
-      status: 401,
-      headers: { 'WWW-Authenticate': 'Basic realm="Restricted Area"' },
-    });
+  // Обработка сабмита формы логина
+  if (url.pathname === '/_auth' && request.method === 'POST') {
+    const form = await request.formData();
+    const user = (form.get('user') || '').toString();
+    const pass = (form.get('pass') || '').toString();
+    const next = (form.get('next') || '/theme.html').toString();
+
+    if (user === USER && pass === PASS) {
+      const res = Response.redirect(new URL(next, url), 302);
+      // cookie на 24 часа
+      res.headers.append(
+        'Set-Cookie',
+        'auth_ok=1; Path=/; Max-Age=86400; HttpOnly; Secure; SameSite=Lax'
+      );
+      return res;
+    }
+    // ошибка — вернём на форму с маркером ошибки
+    const back = new URL('/locked.html', url);
+    back.searchParams.set('e', '1');
+    back.searchParams.set('next', next);
+    return Response.redirect(back, 302);
   }
 
-  const [scheme, encoded] = auth.split(' ');
-  if (scheme !== 'Basic' || !encoded) {
-    return new Response('Invalid auth', {
-      status: 401,
-      headers: { 'WWW-Authenticate': 'Basic realm="Restricted Area"' },
-    });
+  // Защита самой страницы
+  if (url.pathname === '/theme.html') {
+    const cookies = request.headers.get('cookie') || '';
+    const ok = /(?:^|;\s*)auth_ok=1(?:;|$)/.test(cookies);
+    if (ok) return; // пускаем дальше
+
+    // не залогинен — уводим на форму
+    const login = new URL('/locked.html', url);
+    login.searchParams.set('next', url.pathname);
+    return Response.redirect(login, 302);
   }
 
-  const [user, pass] = atob(encoded).split(':');
-
-  if (user === USER && pass === PASS) {
-    // Пускаем дальше
-    return Response.next();
-  }
-
-  return new Response('Unauthorized', {
-    status: 401,
-    headers: { 'WWW-Authenticate': 'Basic realm="Restricted Area"' },
-  });
+  // по умолчанию — ничего не делаем
+  return;
 }

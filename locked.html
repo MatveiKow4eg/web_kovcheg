@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Страница в разработке — вход</title>
+  <style>
+    :root {
+      --bg:#0f172a; --card:#111827; --muted:#9ca3af; --text:#e5e7eb; --accent:#22c55e; --danger:#ef4444;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(180deg,#0b1220,#0f172a 30%,#0b1220);
+      color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+    }
+    .wrap{width:min(560px,92vw); background:rgba(17,24,39,.7); backdrop-filter:saturate(140%) blur(6px);
+      border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); padding:28px; box-shadow:0 20px 80px rgba(0,0,0,.35)}
+    h1{margin:0 0 8px; font-size:28px; letter-spacing:.3px}
+    p.lead{margin:0 0 18px; color:var(--muted); line-height:1.5}
+    form{display:grid; gap:12px; margin-top:12px}
+    label{font-size:14px; color:#cbd5e1}
+    input[type="text"],input[type="password"]{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
+      background:#0b1020; color:var(--text); outline:none;
+    }
+    input:focus{border-color:#475569}
+    .row{display:grid; gap:12px; grid-template-columns:1fr 1fr}
+    button{
+      margin-top:6px; padding:12px 16px; border:0; border-radius:999px; font-weight:700; cursor:pointer;
+      background:linear-gradient(180deg,#22c55e,#16a34a); color:#052e16;
+    }
+    .note{margin-top:10px; font-size:13px; color:var(--muted)}
+    .error{margin:0 0 10px; padding:10px 12px; border-radius:10px; background:rgba(239,68,68,.12); color:#fecaca; border:1px solid rgba(239,68,68,.35)}
+    .success{color:#86efac}
+    @media (max-width:560px){ .row{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Страница в разработке</h1>
+    <p class="lead">Эта страница сейчас закрыта для посетителей. Если вы из команды — войдите, чтобы продолжить редактирование.</p>
+
+    <form method="POST" action="/_auth">
+      <div id="err" class="error" style="display:none;">Неверный логин или пароль</div>
+
+      <div class="row">
+        <div>
+          <label for="user">Логин</label>
+          <input id="user" name="user" type="text" autocomplete="username" required />
+        </div>
+        <div>
+          <label for="pass">Пароль</label>
+          <input id="pass" name="pass" type="password" autocomplete="current-password" required />
+        </div>
+      </div>
+
+      <!-- куда вернуть после логина -->
+      <input id="next" name="next" type="hidden" value="/theme.html" />
+
+      <button type="submit">Войти</button>
+      <div class="note">Нужен доступ? Напишите координатору лагеря.</div>
+    </form>
+  </main>
+
+  <script>
+    // подхватить ?next=/что‑то и ?e=1 из URL
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next');
+    if (next) document.getElementById('next').value = next;
+    if (params.get('e') === '1') document.getElementById('err').style.display = 'block';
+  </script>
+</body>
+</html>
