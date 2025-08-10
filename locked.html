@@ -12,63 +12,17 @@
   <link rel="apple-touch-icon" href="favicon_io/apple-touch-icon.png">
   <link rel="manifest" href="favicon_io/site.webmanifest">
 
-  <!-- Fonts & base styles -->
+  <!-- Base styles -->
   <link rel="stylesheet" href="style-index.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;900&display=swap&subset=cyrillic" rel="stylesheet" />
 
   <style>
-    /* mobile: сначала пояснение, потом логин */
-@media (max-width: 650px) {
-  .auth-wrap {
-    display: flex;           /* вместо grid на мобилке */
-    flex-direction: column;  /* один столбец */
-    gap: 12px;
-  }
-  .auth-note { order: -1; }  /* перемещаем пояснение вверх */
-}
+    /* ---------- Доп. правки только для этой страницы ---------- */
 
-    /* ---------- AUTH PAGE TWEAKS ---------- */
-    body { background: #f7f8fa; }
-    .auth-hero {
-      margin: 0 auto;
-      padding: 0 var(--side-padding);
-      max-width: var(--max-content-width);
-    }
-    .auth-hero-wrap {
-      position: relative;
-      width: 100%;
-      height: min(62vh, 520px);
-      min-height: 260px;
-      border-radius: 24px;
-      overflow: hidden;
-      background: #d8d8d8;
-      display: flex;
-      align-items: flex-end;
-      box-shadow: 0 2px 18px rgba(30,30,20,.06);
-    }
-    .auth-hero::after { content: ""; display: table; clear: both; }
-    .auth-hero-img {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover;
-    }
-    .auth-hero-gradient {
-      position: absolute; left:0; right:0; bottom:0; height: 52%;
-      background: linear-gradient(to top, rgba(20,22,25,.52) 86%, rgba(20,22,25,.08) 100%);
-      z-index: 1;
-    }
-    .auth-title {
-      position: absolute; left: clamp(16px, 7vw, 90px); bottom: clamp(8px, 5vw, 60px);
-      font-weight: 900; font-size: clamp(2.2rem, 7vw, 5.6rem); color: #ff7847; line-height: .95;
-      text-shadow: 0 6px 14px rgba(0,0,0,.22); z-index: 2; margin: 0;
-    }
-    .auth-subtitle {
-      position: absolute; right: clamp(16px, 7vw, 90px); bottom: clamp(22px, 6vw, 70px);
-      color:#fff; font-weight: 500; font-size: clamp(1rem, 1.6vw, 1.3rem);
-      text-shadow: 0 4px 18px rgba(0,0,0,.25); z-index: 2; text-align: right; margin: 0;
-      max-width: clamp(220px, 36vw, 560px);
-    }
+    /* Герой — используем вашу разметку и стили из style-index.css */
 
-    .auth-wrap {
+    /* Карточки: форма и пояснение */
+    .auth-wrap{
       max-width: 860px;
       margin: clamp(18px, 5vw, 42px) auto 48px;
       padding: clamp(16px, 3vw, 24px);
@@ -76,111 +30,110 @@
       grid-template-columns: 1.2fr .8fr;
       gap: clamp(16px, 3vw, 26px);
     }
-    @media (max-width: 900px) { .auth-wrap { grid-template-columns: 1fr; gap: 16px; } }
+    @media (max-width: 900px){ .auth-wrap{ grid-template-columns: 1fr; gap: 16px; } }
 
-    .auth-card, .auth-note {
+    .auth-card, .auth-note{
       background:#fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(60,50,30,.07);
-      border: 1px solid #eee;
+      border-radius:16px;
+      box-shadow:0 8px 24px rgba(60,50,30,.07);
+      border:1px solid #eee;
+      padding:22px;
     }
-    .auth-card { padding: 22px; }
-    .auth-note { padding: 22px; }
+    .auth-card h2{ margin:0 0 8px; color:#103e43; font-weight:900; font-size:1.6rem; letter-spacing:-.3px; }
+    .auth-card p{ color:#1a4348; margin:0 0 14px; }
 
-    .auth-card h2 {
-      margin: 0 0 8px; color:#103e43; font-weight: 900; font-size: 1.6rem; letter-spacing:-.3px;
+    /* Форма — сетка, чтобы ничего не наезжало */
+    .auth-form{ display:grid; gap:12px; margin-top:6px; }
+    .auth-row{
+      display:grid !important;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      align-items:start;
     }
-    .auth-card p { color:#1a4348; margin: 0 0 14px; }
-
-    .auth-form { display: grid; gap: 12px; margin-top: 6px; }
-    .auth-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 520px) { .auth-row { grid-template-columns: 1fr; } }
-
-    .auth-label { font-size: 14px; color:#35565b; font-weight:700; margin-bottom: 6px; display:block; }
-    .auth-input {
-      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #e4e7ec;
-      background: #fff; color:#222; outline: none; font-size: 16px;
+    .auth-row > div{ min-width:0; }
+    .auth-label{ display:block; font-size:14px; color:#35565b; font-weight:700; margin-bottom:6px; }
+    .auth-input{
+      width:100%; min-width:0; box-sizing:border-box;
+      padding:12px 14px; border-radius:12px; border:1px solid #e4e7ec; background:#fff; color:#222; font-size:16px;
     }
-    .auth-input:focus { border-color: #b4c3c7; box-shadow: 0 0 0 3px rgba(25,60,67,.08); }
-
-    .auth-actions { display:flex; align-items:center; gap:12px; margin-top: 6px; }
-    .auth-btn {
-      background:#ff7847; color:#fff; border:0; border-radius: 9999px; padding: 12px 22px;
-      font-weight:700; cursor:pointer; transition: background .2s, transform .08s ease-in-out;
+    .auth-input:focus{ border-color:#b4c3c7; box-shadow:0 0 0 3px rgba(25,60,67,.08); }
+    .auth-actions{ display:flex; align-items:center; gap:12px; margin-top:6px; }
+    .auth-btn{
+      background:#ff7847; color:#fff; border:0; border-radius:9999px; padding:12px 22px; font-weight:700; cursor:pointer;
+      transition:background .2s, transform .08s ease-in-out;
     }
-    .auth-btn:hover { background:#e45f2f; }
-    .auth-btn:active { transform: translateY(1px); }
-    .auth-helper { font-size: 13px; color:#666; }
+    .auth-btn:hover{ background:#e45f2f; }
+    .auth-btn:active{ transform:translateY(1px); }
 
-    .auth-error {
-      display:none; margin: 0 0 10px; padding: 10px 12px;
-      border-radius: 10px; background: rgba(239,68,68,.08); color: #b91c1c;
-      border: 1px solid rgba(239,68,68,.35); font-weight: 600;
+    .auth-error{
+      display:none; margin:0 0 10px; padding:10px 12px; border-radius:10px;
+      background:rgba(239,68,68,.08); color:#b91c1c; border:1px solid rgba(239,68,68,.35); font-weight:600;
     }
 
-    .auth-note h3 { margin: 0 0 8px; color:#103e43; font-size: 1.2rem; font-weight: 900; }
-    .auth-note p { margin: 0 0 10px; color:#35565b; line-height: 1.55; }
-    .auth-badge {
-      display:inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
-      color:#052e16; background: linear-gradient(180deg,#22c55e,#16a34a);
+    .auth-note h3{ margin:0 0 8px; color:#103e43; font-size:1.2rem; font-weight:900; }
+    .auth-note p{ margin:0 0 10px; color:#35565b; line-height:1.55; }
+    .auth-badge{
+      display:inline-block; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700;
+      color:#052e16; background:linear-gradient(180deg,#22c55e,#16a34a);
     }
 
-    /* mobile hero text adjustments */
-    @media (max-width: 650px) {
-      .auth-title { left: 50%; transform: translateX(-50%); bottom: 92px; font-size: 3rem; text-align: center; }
-      .auth-subtitle { left: 12px; right: 12px; bottom: 10vw; text-align: center; }
-      .auth-hero-wrap { border-radius: 12px; }
+    /* Мобильная логика: сначала пояснение, затем форма */
+    @media (max-width: 650px){
+      .auth-wrap{ display:flex; flex-direction:column; gap:12px; }
+      .auth-note{ order:-1; }
+      .auth-row{ grid-template-columns:1fr; }
     }
   </style>
 </head>
 <body>
 
-<header class="main-header">
-  <div class="header-container">
-    <div class="main-logo">
-      <img 
-        src="optimized_img/index_img/logo/logo_black-40.webp"
-        srcset="optimized_img/index_img/logo/logo_black-40.webp 40w, optimized_img/index_img/logo/logo_black-80.webp 80w"
+  <!-- Хедер 1-в-1 как на сайте (бургер + выезжающее меню работают через ваш js/camp-program.js) -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="main-logo">
+        <img
+          src="optimized_img/index_img/logo/logo_black-40.webp"
+          srcset="optimized_img/index_img/logo/logo_black-40.webp 40w, optimized_img/index_img/logo/logo_black-80.webp 80w"
+          alt="Ковчег"
+        />
+      </div>
+      <nav class="main-nav">
+        <a href="index.html">Главная</a>
+        <a href="theme.html" class="active">Тема</a>
+        <a href="about.html">О лагере</a>
+        <a href="gallery.html">Галерея</a>
+      </nav>
+      <button class="burger" aria-label="Открыть меню">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Герой: используем те же классы, что и на index.html -->
+  <section class="hero-section">
+    <div class="hero-img-wrap">
+      <img
+        src="main.webp"
+        srcset="optimized_img/main-400.webp 400w, optimized_img/main-800.webp 800w, optimized_img/main-1200.webp 1200w"
+        sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
         alt="Ковчег"
+        class="hero-img"
+        fetchpriority="high"
       />
+      <div class="hero-gradient"></div>
+      <h1 class="hero-title">Ковчег</h1>
+      <div class="hero-subtitle">
+        Эта страница сейчас в разработке. Команда может войти ниже, чтобы продолжить работу.
+      </div>
     </div>
-    <nav class="main-nav">
-      <a href="index.html">Главная</a>
-      <a href="theme.html" class="active">Тема</a>
-      <a href="about.html">О лагере</a>
-      <a href="gallery.html">Галерея</a>
-    </nav>
-    <button class="burger" aria-label="Открыть меню">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
+  </section>
 
-
-<section class="hero-section">
-  <div class="hero-img-wrap">
-    <img 
-      src="main.webp"
-      srcset="optimized_img/main-400.webp 400w, optimized_img/main-800.webp 800w, optimized_img/main-1200.webp 1200w"
-      sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
-      alt="Ковчег"
-      class="hero-img"
-      fetchpriority="high"
-    />
-    <div class="hero-gradient"></div>
-    <h1 class="hero-title">Ковчег</h1>
-    <div class="hero-subtitle">
-      Эта страница сейчас в разработке
-    </div>
-  </div>
-</section>
-
-  <!-- Контент: форма входа + блок-объяснение -->
+  <!-- Контент -->
   <main class="auth-wrap">
     <!-- Форма входа -->
     <section class="auth-card" aria-labelledby="auth-title">
       <h2 id="auth-title">Вход для команды</h2>
-      <p>Введите логин и пароль, чтобы открыть закрытую страницу</p>
+      <p>Введите логин и пароль, чтобы открыть закрытую страницу.</p>
 
       <div id="auth-error" class="auth-error">Неверный логин или пароль</div>
 
@@ -196,6 +149,7 @@
           </div>
         </div>
 
+        <!-- куда вернуть после входа -->
         <input id="next" name="next" type="hidden" value="/theme.html" />
 
         <div class="auth-actions">
@@ -204,29 +158,32 @@
       </form>
     </section>
 
-    <!-- Пояснение для посетителей -->
+    <!-- Пояснение -->
     <aside class="auth-note">
       <h3>Страница в разработке</h3>
-      <p>Мы обновляем этот раздел сайта, чтобы сделать его удобнее и полезнее</p>
-      <p><span class="auth-badge">Обновление</span> Возвращайтесь позже - скоро всё будет готово!</p>
+      <p>Мы обновляем этот раздел сайта, чтобы сделать его удобнее и полезнее.</p>
+      <p><span class="auth-badge">Обновление</span> Возвращайтесь позже — скоро всё будет готово!</p>
       <p style="margin-top:12px">
         Можно пока посмотреть <a href="gallery.html" style="color:#193c43;font-weight:700">галерею</a> или узнать больше
-        <a href="about.html" style="color:#193c43;font-weight:700">о лагере</a>
+        <a href="about.html" style="color:#193c43;font-weight:700">о лагере</a>.
       </p>
     </aside>
   </main>
 
+  <!-- Локальная логика страницы -->
   <script>
-    // Показываем ошибку, если ?e=1
+    // Показать ошибку, если ?e=1
     const params = new URLSearchParams(location.search);
     if (params.get('e') === '1') {
       const el = document.getElementById('auth-error');
       if (el) el.style.display = 'block';
     }
-    // Подставляем адрес возврата, если ?next=/...
+    // Передать возврат, если ?next=/...
     const next = params.get('next');
     if (next) document.getElementById('next').value = next;
   </script>
-<script src="js/camp-program.js"></script>
+
+  <!-- Ваш общий скрипт (бургер-меню и т.п.) -->
+  <script src="js/camp-program.js"></script>
 </body>
 </html>
