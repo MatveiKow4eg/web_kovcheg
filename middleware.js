@@ -1,15 +1,12 @@
 // middleware.js
-import { next } from '@vercel/functions';
 
-// Какие маршруты закрываем паролем — поменяй под себя
 export const config = {
   matcher: [
+    '/theme.html',
     '/admin/:path*',
     '/draft/:path*',
-    '/theme-edit',     // пример одиночной страницы /theme-edit
-    '/secret',         // пример /secret
-    // Если нужно защитить файл /theme.html:
-    '/theme.html'
+    '/theme-edit',
+    '/secret'
   ],
 };
 
@@ -37,12 +34,11 @@ export default function middleware(request) {
     });
   }
 
-  // atob доступен в edge-окружении
   const [user, pass] = atob(encoded).split(':');
 
   if (user === USER && pass === PASS) {
-    // Пускаем дальше к странице/статике
-    return next();
+    // Пускаем дальше
+    return Response.next();
   }
 
   return new Response('Unauthorized', {
