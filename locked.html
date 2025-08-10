@@ -2,75 +2,217 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Страница в разработке — вход</title>
+  <title>Страница в разработке — Ковчег</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="favicon_io/favicon.ico">
+  <link rel="apple-touch-icon" href="favicon_io/apple-touch-icon.png">
+  <link rel="manifest" href="favicon_io/site.webmanifest">
+
+  <!-- Fonts & base styles -->
+  <link rel="stylesheet" href="style-index.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;900&display=swap&subset=cyrillic" rel="stylesheet" />
+
   <style>
-    :root {
-      --bg:#0f172a; --card:#111827; --muted:#9ca3af; --text:#e5e7eb; --accent:#22c55e; --danger:#ef4444;
-      --radius:16px;
+    /* ---------- AUTH PAGE TWEAKS ---------- */
+    body { background: #f7f8fa; }
+    .auth-hero {
+      margin: 0 auto;
+      padding: 0 var(--side-padding);
+      max-width: var(--max-content-width);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; display:flex; align-items:center; justify-content:center;
-      background:linear-gradient(180deg,#0b1220,#0f172a 30%,#0b1220);
-      color:var(--text); font-family:system-ui,-apple-system,Segoe UI,Inter,Arial,sans-serif;
+    .auth-hero-wrap {
+      position: relative;
+      width: 100%;
+      height: min(62vh, 520px);
+      min-height: 260px;
+      border-radius: 24px;
+      overflow: hidden;
+      background: #d8d8d8;
+      display: flex;
+      align-items: flex-end;
+      box-shadow: 0 2px 18px rgba(30,30,20,.06);
     }
-    .wrap{width:min(560px,92vw); background:rgba(17,24,39,.7); backdrop-filter:saturate(140%) blur(6px);
-      border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); padding:28px; box-shadow:0 20px 80px rgba(0,0,0,.35)}
-    h1{margin:0 0 8px; font-size:28px; letter-spacing:.3px}
-    p.lead{margin:0 0 18px; color:var(--muted); line-height:1.5}
-    form{display:grid; gap:12px; margin-top:12px}
-    label{font-size:14px; color:#cbd5e1}
-    input[type="text"],input[type="password"]{
-      width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.08);
-      background:#0b1020; color:var(--text); outline:none;
+    .auth-hero::after { content: ""; display: table; clear: both; }
+    .auth-hero-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
     }
-    input:focus{border-color:#475569}
-    .row{display:grid; gap:12px; grid-template-columns:1fr 1fr}
-    button{
-      margin-top:6px; padding:12px 16px; border:0; border-radius:999px; font-weight:700; cursor:pointer;
-      background:linear-gradient(180deg,#22c55e,#16a34a); color:#052e16;
+    .auth-hero-gradient {
+      position: absolute; left:0; right:0; bottom:0; height: 52%;
+      background: linear-gradient(to top, rgba(20,22,25,.52) 86%, rgba(20,22,25,.08) 100%);
+      z-index: 1;
     }
-    .note{margin-top:10px; font-size:13px; color:var(--muted)}
-    .error{margin:0 0 10px; padding:10px 12px; border-radius:10px; background:rgba(239,68,68,.12); color:#fecaca; border:1px solid rgba(239,68,68,.35)}
-    .success{color:#86efac}
-    @media (max-width:560px){ .row{grid-template-columns:1fr} }
+    .auth-title {
+      position: absolute; left: clamp(16px, 7vw, 90px); bottom: clamp(8px, 5vw, 60px);
+      font-weight: 900; font-size: clamp(2.2rem, 7vw, 5.6rem); color: #ff7847; line-height: .95;
+      text-shadow: 0 6px 14px rgba(0,0,0,.22); z-index: 2; margin: 0;
+    }
+    .auth-subtitle {
+      position: absolute; right: clamp(16px, 7vw, 90px); bottom: clamp(22px, 6vw, 70px);
+      color:#fff; font-weight: 500; font-size: clamp(1rem, 1.6vw, 1.3rem);
+      text-shadow: 0 4px 18px rgba(0,0,0,.25); z-index: 2; text-align: right; margin: 0;
+      max-width: clamp(220px, 36vw, 560px);
+    }
+
+    .auth-wrap {
+      max-width: 860px;
+      margin: clamp(18px, 5vw, 42px) auto 48px;
+      padding: clamp(16px, 3vw, 24px);
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: clamp(16px, 3vw, 26px);
+    }
+    @media (max-width: 900px) { .auth-wrap { grid-template-columns: 1fr; gap: 16px; } }
+
+    .auth-card, .auth-note {
+      background:#fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(60,50,30,.07);
+      border: 1px solid #eee;
+    }
+    .auth-card { padding: 22px; }
+    .auth-note { padding: 22px; }
+
+    .auth-card h2 {
+      margin: 0 0 8px; color:#103e43; font-weight: 900; font-size: 1.6rem; letter-spacing:-.3px;
+    }
+    .auth-card p { color:#1a4348; margin: 0 0 14px; }
+
+    .auth-form { display: grid; gap: 12px; margin-top: 6px; }
+    .auth-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 520px) { .auth-row { grid-template-columns: 1fr; } }
+
+    .auth-label { font-size: 14px; color:#35565b; font-weight:700; margin-bottom: 6px; display:block; }
+    .auth-input {
+      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #e4e7ec;
+      background: #fff; color:#222; outline: none; font-size: 16px;
+    }
+    .auth-input:focus { border-color: #b4c3c7; box-shadow: 0 0 0 3px rgba(25,60,67,.08); }
+
+    .auth-actions { display:flex; align-items:center; gap:12px; margin-top: 6px; }
+    .auth-btn {
+      background:#ff7847; color:#fff; border:0; border-radius: 9999px; padding: 12px 22px;
+      font-weight:700; cursor:pointer; transition: background .2s, transform .08s ease-in-out;
+    }
+    .auth-btn:hover { background:#e45f2f; }
+    .auth-btn:active { transform: translateY(1px); }
+    .auth-helper { font-size: 13px; color:#666; }
+
+    .auth-error {
+      display:none; margin: 0 0 10px; padding: 10px 12px;
+      border-radius: 10px; background: rgba(239,68,68,.08); color: #b91c1c;
+      border: 1px solid rgba(239,68,68,.35); font-weight: 600;
+    }
+
+    .auth-note h3 { margin: 0 0 8px; color:#103e43; font-size: 1.2rem; font-weight: 900; }
+    .auth-note p { margin: 0 0 10px; color:#35565b; line-height: 1.55; }
+    .auth-badge {
+      display:inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      color:#052e16; background: linear-gradient(180deg,#22c55e,#16a34a);
+    }
+
+    /* mobile hero text adjustments */
+    @media (max-width: 650px) {
+      .auth-title { left: 50%; transform: translateX(-50%); bottom: 92px; font-size: 3rem; text-align: center; }
+      .auth-subtitle { left: 12px; right: 12px; bottom: 10vw; text-align: center; }
+      .auth-hero-wrap { border-radius: 12px; }
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Страница в разработке</h1>
-    <p class="lead">Эта страница сейчас закрыта для посетителей. Если вы из команды — войдите, чтобы продолжить редактирование.</p>
 
-    <form method="POST" action="/api/auth">
-      <div id="err" class="error" style="display:none;">Неверный логин или пароль</div>
-
-      <div class="row">
-        <div>
-          <label for="user">Логин</label>
-          <input id="user" name="user" type="text" autocomplete="username" required />
-        </div>
-        <div>
-          <label for="pass">Пароль</label>
-          <input id="pass" name="pass" type="password" autocomplete="current-password" required />
-        </div>
+  <!-- Хедер как на сайте (без бургер-меню, минимально) -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="main-logo">
+        <a href="index.html" style="display:flex;align-items:center">
+          <img 
+            src="optimized_img/index_img/logo/logo_black-40.webp"
+            srcset="optimized_img/index_img/logo/logo_black-40.webp 40w, optimized_img/index_img/logo/logo_black-80.webp 80w"
+            alt="Ковчег"
+          />
+        </a>
       </div>
+      <nav class="main-nav">
+        <a href="index.html">Главная</a>
+        <a href="theme.html" class="active">Тема</a>
+        <a href="about.html">О лагере</a>
+        <a href="gallery.html">Галерея</a>
+      </nav>
+    </div>
+  </header>
 
-      <!-- куда вернуть после логина -->
-      <input id="next" name="next" type="hidden" value="/theme.html" />
+  <!-- Hero блок под стиль сайта -->
+  <section class="auth-hero">
+    <div class="auth-hero-wrap">
+      <img class="auth-hero-img" src="main.webp"
+           srcset="optimized_img/main-400.webp 400w, optimized_img/main-800.webp 800w, optimized_img/main-1200.webp 1200w"
+           sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
+           alt="Ковчег">
+      <div class="auth-hero-gradient"></div>
+      <h1 class="auth-title">Ковчег</h1>
+      <p class="auth-subtitle">Эта страница сейчас в разработке. Команда может войти ниже, чтобы продолжить работу.</p>
+    </div>
+  </section>
 
-      <button type="submit">Войти</button>
-      <div class="note">Нужен доступ? Напишите координатору лагеря.</div>
-    </form>
+  <!-- Контент: форма входа + блок-объяснение -->
+  <main class="auth-wrap">
+    <!-- Форма входа -->
+    <section class="auth-card" aria-labelledby="auth-title">
+      <h2 id="auth-title">Вход для команды</h2>
+      <p>Введите логин и пароль, чтобы открыть закрытую страницу.</p>
+
+      <div id="auth-error" class="auth-error">Неверный логин или пароль</div>
+
+      <form class="auth-form" method="POST" action="/api/auth">
+        <div class="auth-row">
+          <div>
+            <label class="auth-label" for="user">Логин</label>
+            <input class="auth-input" id="user" name="user" type="text" autocomplete="username" required />
+          </div>
+          <div>
+            <label class="auth-label" for="pass">Пароль</label>
+            <input class="auth-input" id="pass" name="pass" type="password" autocomplete="current-password" required />
+          </div>
+        </div>
+
+        <input id="next" name="next" type="hidden" value="/theme.html" />
+
+        <div class="auth-actions">
+          <button type="submit" class="auth-btn">Войти</button>
+          <span class="auth-helper">Нет доступа? Напишите координатору лагеря.</span>
+        </div>
+      </form>
+    </section>
+
+    <!-- Пояснение для посетителей -->
+    <aside class="auth-note">
+      <h3>Страница в разработке</h3>
+      <p>Мы обновляем этот раздел сайта, чтобы сделать его удобнее и полезнее. Здесь появятся материалы лагеря,
+        фотографии, рассказы и многое другое.</p>
+      <p><span class="auth-badge">Обновление</span> Возвращайтесь позже — скоро всё будет готово!</p>
+      <p style="margin-top:12px">
+        Можно пока посмотреть <a href="gallery.html" style="color:#193c43;font-weight:700">галерею</a> или узнать больше
+        <a href="about.html" style="color:#193c43;font-weight:700">о лагере</a>.
+      </p>
+    </aside>
   </main>
 
   <script>
-    // подхватить ?next=/что‑то и ?e=1 из URL
+    // Показываем ошибку, если ?e=1
     const params = new URLSearchParams(location.search);
+    if (params.get('e') === '1') {
+      const el = document.getElementById('auth-error');
+      if (el) el.style.display = 'block';
+    }
+    // Подставляем адрес возврата, если ?next=/...
     const next = params.get('next');
     if (next) document.getElementById('next').value = next;
-    if (params.get('e') === '1') document.getElementById('err').style.display = 'block';
   </script>
+
 </body>
 </html>
