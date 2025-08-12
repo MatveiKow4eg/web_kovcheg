@@ -1618,7 +1618,6 @@ background: linear-gradient(125deg, rgba(213, 195, 219, 1) 0%, rgba(175, 181, 21
   cursor:pointer;
   background:#FF7A4E;         /* твой оранжевый */
   color:#fff;
-  -webkit-appearance:none;
 }
 
 /* Мобилки: в колонку и на всю ширину */
