@@ -1602,7 +1602,6 @@ background: linear-gradient(125deg, rgba(213, 195, 219, 1) 0%, rgba(175, 181, 21
   outline:none;
   box-sizing:border-box;
   font:inherit;
-  -webkit-appearance:none;
 }
 
 .footer-subscribe button{
