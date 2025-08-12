@@ -1174,7 +1174,6 @@ background: linear-gradient(125deg, rgba(213, 195, 219, 1) 0%, rgba(175, 181, 21
   max-width: 240px;
   border: none;
   border-radius: 4px;
-  margin-bottom: 10px;
 }
 
 .footer-subscribe button {
@@ -1570,5 +1569,66 @@ background: linear-gradient(125deg, rgba(213, 195, 219, 1) 0%, rgba(175, 181, 21
 @media (max-width: 768px) {
   .footer-media-logo {
     display: none;
+  }
+}
+
+
+/* Подписка на новости */
+.footer-subscribe #zcampaignOptinForm{
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+}
+.footer-subscribe #zcWebOptin{
+  padding:12px 16px; border:none; border-radius:10px; cursor:pointer;
+}
+
+
+
+
+
+/* Подписка в футере */
+.footer-subscribe .subscribe-form{
+  display:flex;
+  align-items:center;         /* ровняем по центру по вертикали */
+  gap:12px;
+  flex-wrap:wrap;             /* чтобы на узких экранах переносилось */
+  margin:0;
+}
+
+.footer-subscribe input[type="email"]{
+  height:44px;
+  padding:0 16px;
+  border:1px solid #E5E7EB;
+  border-radius:10px;
+  outline:none;
+  box-sizing:border-box;
+  font:inherit;
+  -webkit-appearance:none;
+}
+
+.footer-subscribe button{
+  height:44px;
+  padding:0 18px;
+  border:0;
+  border-radius:10px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;              /* чтобы не “выпирал” текст */
+  font-weight:600;
+  cursor:pointer;
+  background:#FF7A4E;         /* твой оранжевый */
+  color:#fff;
+  -webkit-appearance:none;
+}
+
+/* Мобилки: в колонку и на всю ширину */
+@media (max-width: 560px){
+  .footer-subscribe .subscribe-form{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .footer-subscribe input[type="email"],
+  .footer-subscribe button{
+    width:100%;
   }
 }
