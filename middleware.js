@@ -1,25 +1,22 @@
-import { NextResponse } from 'next/server';
-
-export const config = { matcher: ['/theme', '/theme.html'] };
+// middleware.js
+export const config = { matcher: ['/theme.html'] };
 
 export default function middleware(request) {
   const url = new URL(request.url);
   const USER = process.env.BASIC_AUTH_USER;
   const PASS = process.env.BASIC_AUTH_PASS;
 
-  // Если переменные не заданы — на заглушку
+  // Если переменные не заданы — сразу на заглушку
   if (!USER || !PASS) {
-    return NextResponse.redirect(new URL('/locked.html', url), 302);
+    return Response.redirect(new URL('/locked.html', url), 302);
   }
 
-  // Проверяем куку
+  // Пускаем, если стоит кука
   const cookies = request.headers.get('cookie') || '';
-  if (/(^|;\s*)auth_ok=1(;|$)/.test(cookies)) {
-    return NextResponse.next();
-  }
+  if (/(^|;\s*)auth_ok=1(;|$)/.test(cookies)) return;
 
-  // Если нет куки — отправляем на locked.html с возвратом на нужную страницу
-  const loginUrl = new URL('/locked.html', url);
-  loginUrl.searchParams.set('next', url.pathname);
-  return NextResponse.redirect(loginUrl, 302);
+  // Иначе — на форму
+  const login = new URL('/locked.html', url);
+  login.searchParams.set('next', url.pathname);
+  return Response.redirect(login, 302);
 }
