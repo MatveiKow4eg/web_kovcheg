@@ -1,4 +1,3 @@
-// middleware.js
 export const config = { matcher: ['/theme', '/theme.html'] };
 
 export default function middleware(request) {
