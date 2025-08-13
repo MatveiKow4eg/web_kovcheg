@@ -1,3 +1,4 @@
+// middleware.js
 export const config = { matcher: ['/theme', '/theme.html'] };
 
 export default function middleware(request) {
@@ -6,13 +7,13 @@ export default function middleware(request) {
   const PASS = process.env.BASIC_AUTH_PASS;
 
   if (!USER || !PASS) {
-    return Response.redirect(new URL('/locked.html', url), 302);
+    return Response.redirect(new URL('/locked', url), 302);
   }
 
   const cookies = request.headers.get('cookie') || '';
   if (/(^|;\s*)auth_ok=1(;|$)/.test(cookies)) return;
 
-  const login = new URL('/locked.html', url);
+  const login = new URL('/locked', url);
   login.searchParams.set('next', url.pathname);
   return Response.redirect(login, 302);
 }
