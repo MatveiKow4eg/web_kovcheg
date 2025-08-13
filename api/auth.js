@@ -20,7 +20,8 @@ export default async function handler(req, res) {
     const params = new URLSearchParams(body);
     const user = (params.get('user') || '').toString();
     const pass = (params.get('pass') || '').toString();
-    const next = params.get('next') || '/theme';
+  const next = (params.get('next') || '/theme').toString();
+
 
     if (user === USER && pass === PASS) {
       // Ставим куку на 24 часа
