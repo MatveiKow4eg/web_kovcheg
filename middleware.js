@@ -8,7 +8,7 @@ export default function middleware(request) {
 
   // Если переменные не заданы — сразу на заглушку
   if (!USER || !PASS) {
-    return Response.redirect(new URL('/locked.html', url), 302);
+    return Response.redirect(new URL('/theme', '/theme.html', url), 302);
   }
 
   // Пускаем, если стоит кука
@@ -16,7 +16,7 @@ export default function middleware(request) {
   if (/(^|;\s*)auth_ok=1(;|$)/.test(cookies)) return;
 
   // Иначе — на форму
-  const login = new URL('/locked.html', url);
+  const login = new URL('/theme', '/theme.html', url);
   login.searchParams.set('next', url.pathname);
   return Response.redirect(login, 302);
 }
