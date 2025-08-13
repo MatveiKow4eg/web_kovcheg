@@ -3,13 +3,11 @@
   "routes": [
     { "src": "^/$", "dest": "/index.html" },
 
+    { "src": "^/theme$", "dest": "/theme.html" },
     { "src": "^/theme\\.html$", "dest": "/theme.html" },
     { "src": "^/locked\\.html$", "dest": "/locked.html" },
 
-    
     { "src": "^/([a-zA-Z0-9_-]+)\\.html$", "status": 308, "headers": { "Location": "/$1" } },
-
-    
     { "src": "^/([a-zA-Z0-9_-]+)$", "dest": "/$1.html" }
   ]
 }
