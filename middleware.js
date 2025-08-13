@@ -1,5 +1,5 @@
 // middleware.js
-export const config = { matcher: ['/theme.html'] };
+export const config = { matcher: ['/theme', '/theme.html'] };
 
 export default function middleware(request) {
   const url = new URL(request.url);
