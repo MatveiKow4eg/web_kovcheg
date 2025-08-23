@@ -8,7 +8,7 @@ export default function middleware(request) {
 
   // Если env не заданы — ведём на форму/заглушку
   if (!USER || !PASS) {
-    return Response.redirect(new URL('/locked', url), 302);
+    return Response.redirect(new URL('/locked.html', url), 302);
   }
 
   // Пускаем, если стоит кука
@@ -16,7 +16,7 @@ export default function middleware(request) {
   if (/(^|;\s*)auth_ok=1(;|$)/.test(cookies)) return;
 
   // Иначе — на форму
-  const login = new URL('/locked', url);
+  const login = new URL('/locked.html', url);
   login.searchParams.set('next', url.pathname); // чтобы вернуться куда шёл
   return Response.redirect(login, 302);
 }
