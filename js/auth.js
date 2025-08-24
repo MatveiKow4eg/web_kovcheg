@@ -2,8 +2,8 @@
 (function() {
   const path = window.location.pathname;
 
-  // Если мы уже на странице locked.html — ничего не делаем
-  if (path === '/locked.html') return;
+  // Не выполняем скрипт на странице locked.html
+  if (path.endsWith('/locked.html')) return;
 
   // Проверяем куку
   if (!document.cookie.includes("auth_ok=1")) {
