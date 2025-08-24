@@ -1,9 +1,13 @@
 // auth.js
 (function() {
-  // Проверяем, есть ли кука auth_ok=1
+  const path = window.location.pathname;
+
+  // Если мы уже на странице locked.html — ничего не делаем
+  if (path === '/locked.html') return;
+
+  // Проверяем куку
   if (!document.cookie.includes("auth_ok=1")) {
-    // Добавляем параметр next, чтобы после логина вернуться
-    const next = encodeURIComponent(window.location.pathname);
+    const next = encodeURIComponent(path);
     window.location.href = "/locked.html?next=" + next;
   }
 })();
