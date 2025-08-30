@@ -110,7 +110,221 @@ body {
   background-color: #e36436;
 }
 
-/* Адаптив */
+/* Product Scroll Panel */
+.product-scroll-section {
+  background-color: #FAF9F7;
+  padding: 60px 0;
+}
+
+.scroll-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 4vw;
+}
+
+.scroll-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.scroll-title-section {
+  text-align: center;
+  flex: 1;
+}
+
+.scroll-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #ff7847;
+  margin: 0 0 8px 0;
+}
+
+.scroll-subtitle {
+  color: #55836d;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.scroll-subtitle:hover {
+  color: #ff7847;
+}
+
+.scroll-arrow {
+  background: #fff;
+  border: 2px solid #ff7847;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ff7847;
+  transition: all 0.2s;
+  position: absolute;
+}
+
+.scroll-left {
+  left: 0;
+}
+
+.scroll-right {
+  right: 0;
+}
+
+.scroll-arrow:hover {
+  background: #ff7847;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.scroll-arrow:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.products-scroll-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.products-scroll-track {
+  display: flex;
+  gap: 24px;
+  transition: transform 0.3s ease;
+  padding: 10px 0;
+}
+
+/* Scroll Product Card */
+.scroll-product-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(40,80,60,0.09);
+  overflow: hidden;
+  min-width: 280px;
+  max-width: 280px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.scroll-product-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 16px 54px rgba(35,77,59,0.17);
+}
+
+.scroll-product-card .product-image {
+  width: 100%;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-product-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 120, 71, 0.9);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s;
+}
+
+.scroll-product-card:hover .product-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-product-card .card-content {
+  padding: 20px;
+  text-align: center;
+}
+
+.scroll-product-card .card-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #103e43;
+}
+
+.scroll-product-card .card-content .description {
+  margin: 0 0 12px 0;
+  color: #55836d;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.scroll-product-card .price {
+  font-weight: 900;
+  font-size: 1.1rem;
+  color: #103e43;
+  margin: 0;
+}
+
+/* Адаптив для scroll panel */
+@media (max-width: 1000px) {
+  .scroll-arrow {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .scroll-title {
+    font-size: 2rem;
+  }
+  
+  .scroll-product-card {
+    min-width: 240px;
+    max-width: 240px;
+  }
+  
+  .products-scroll-track {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .scroll-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .scroll-arrow {
+    position: static;
+  }
+  
+  .scroll-arrows-container {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .scroll-product-card {
+    min-width: 280px;
+    max-width: 280px;
+  }
+  
+  .scroll-container {
+    padding: 0 20px;
+  }
+}
+
+/* Existing styles */
 @media (max-width: 1000px) {
   .catalog-grid {
     gap: 24px;
