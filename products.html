@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Товар | Ковчег</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="favicon_io/favicon.ico">
+  <link rel="apple-touch-icon" href="favicon_io/apple-touch-icon.png">
+  <link rel="manifest" href="favicon_io/site.webmanifest">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="style-index.css" />
+  <link rel="stylesheet" href="style-products.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;900&display=swap&subset=cyrillic" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="main-shell">
+    <!-- ХЕДЕР -->
+    <header class="main-header">
+      <div class="header-container">
+        <div class="main-logo">
+          <img 
+            src="optimized_img/index_img/logo/logo_black-40.webp"
+            srcset="optimized_img/index_img/logo/logo_black-40.webp 40w, optimized_img/index_img/logo/logo_black-80.webp 80w"
+            alt="Ковчег"
+          />
+        </div>
+        <nav class="main-nav">
+          <a href="index.html">Главная</a>
+          <a href="theme.html">Тема</a>
+          <a href="about.html">О лагере</a>
+          <a href="gallery.html">Галерея</a>
+          <a href="catalog.html">Каталог</a>
+        </nav>
+        <button class="burger" aria-label="Открыть меню">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Product Content -->
+    <main>
+      <div class="back-nav">
+        <a href="catalog.html" class="back-link">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Назад к каталогу
+        </a>
+      </div>
+
+      <div id="productContent">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p>Загружаем товар...</p>
+        </div>
+      </div>
+
+      <div id="productTemplate" class="product-page" style="display: none;">
+        <div class="product-image-section">
+          <img id="productImage" class="product-main-image" src="" alt="">
+        </div>
+        
+        <div class="product-details">
+          <h1 id="productTitle" class="product-title"></h1>
+          <div id="productPrice" class="product-price"></div>
+          <div id="productDescription" class="product-description"></div>
+          
+          <div class="product-actions">
+            <button class="btn-primary" id="buyButton">Купить</button>
+            <button class="btn-secondary" id="addToCartButton">В корзину</button>
+          </div>
+          
+          <div class="product-info">
+            <h3>Информация о товаре</h3>
+            <ul id="productFeatures"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="errorTemplate" class="error-state" style="display: none;">
+        <div class="error-content">
+          <h2>Товар не найден</h2>
+          <p>К сожалению, запрашиваемый товар не существует или был удален.</p>
+          <a href="catalog.html" class="btn-primary">Вернуться к каталогу</a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="donation-callout">
+        <h2 class="donation-title">
+          Помоги нам превратить маленькие шаги в большие перемены
+        </h2>
+        <p class="donation-text">
+          Твоё пожертвование помогает осуществлять проекты для детей и подростков города Кохтла-Ярве
+        </p>
+        <a href="donate.html" class="donation-button">Пожертвовать</a>
+      </div>
+
+      <div class="footer-container">
+        <div class="footer-brand">
+          <p class="brand-title">КОВЧЕГ</p>
+          <p class="brand-subtitle">
+            Христианский лагерь<br>Меняем жизни подростков с 2007 года
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <h4>Навигация</h4>
+          <ul>
+            <li><a href="about.html">О лагере</a></li>
+            <li><a href="gallery.html">Галерея</a></li>
+            <li><a href="catalog.html">Каталог</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/products.js"></script>
+</body>
+</html>

@@ -2,7 +2,8 @@
   "version": 2,
   "routes": [
     { "src": "^/$", "dest": "/index.html" },
-
+    
+    { "src": "^/products/([0-9]+)$", "dest": "/products.html?id=$1" },
     
     { "src": "^/theme$", "status": 308, "headers": { "Location": "/theme.html" } },
 
