@@ -1,0 +1,130 @@
+/* Основные стили */
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #FAF9F7;
+  color: #103e43;
+}
+
+.main-header {
+  background-color: #fff;
+  padding: 12px 4vw;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.main-nav a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #103e43;
+  font-weight: 600;
+}
+
+.main-nav a.active {
+  color: #ff7847;
+}
+
+.catalog-section {
+  max-width: 1400px;
+  margin: 48px auto;
+  padding: 0 4vw;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-align: center;
+  color: #ff7847;
+  margin-bottom: 40px;
+}
+
+.catalog-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+}
+
+/* Карточка товара */
+.product-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(40,80,60,0.09);
+  overflow: hidden;
+  max-width: 300px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 16px 54px rgba(35,77,59,0.17);
+}
+
+.product-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.product-card .card-content {
+  padding: 16px;
+  text-align: center;
+}
+
+.product-card .card-content h4 {
+  margin: 8px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.product-card .card-content p {
+  margin: 4px 0;
+  color: #55836d;
+}
+
+.product-card .price {
+  font-weight: 900;
+  margin: 8px 0;
+  color: #103e43;
+}
+
+.buy-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  margin-top: 8px;
+  font-weight: 700;
+  background-color: #ff7847;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.buy-btn:hover {
+  background-color: #e36436;
+}
+
+/* Адаптив */
+@media (max-width: 1000px) {
+  .catalog-grid {
+    gap: 24px;
+  }
+}
+
+@media (max-width: 700px) {
+  .catalog-grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .product-card {
+    max-width: 95%;
+  }
+}
