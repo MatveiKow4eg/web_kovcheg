@@ -29,6 +29,7 @@
 <!-- Для Android Chrome (Web App Manifest) -->
 <link rel="manifest" href="favicon_io/site.webmanifest">
   <link rel="stylesheet" href="style-index.css" />
+  <link rel="stylesheet" href="catalog.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;900&display=swap&subset=cyrillic" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
@@ -78,6 +79,32 @@
       </div>
     </section>
 
+    <!-- product-scroll-panel -->
+    <section class="product-scroll-section">
+      <div class="scroll-container">
+        <div class="scroll-header">
+          <button class="scroll-arrow scroll-left" aria-label="Предыдущие товары">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="scroll-title-section">
+            <h2 class="scroll-title">Наши товары</h2>
+            <a href="#" class="scroll-subtitle">Смотреть все</a>
+          </div>
+          <button class="scroll-arrow scroll-right" aria-label="Следующие товары">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="products-scroll-wrapper">
+          <div class="products-scroll-track" id="productsScrollTrack">
+            <!-- Product cards will be inserted here by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
 
     
 <footer class="site-footer">
@@ -171,5 +198,7 @@
     return true; // важно: не отменяем submit
   }
 </script>
+
+<script src="js/catalog.js"></script>
 
 </html>
