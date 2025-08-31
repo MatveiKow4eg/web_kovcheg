@@ -1,0 +1,17 @@
+:root{ --accent:#ff7847; --muted:#6b7a74; --bg:#faf9f7; --card:#fff; }
+*{box-sizing:border-box}
+body{font-family:Inter,system-ui,Segoe UI,Arial; background:var(--bg); margin:0; color:#103e43}
+.wrap{max-width:1000px;margin:32px auto;padding:16px}
+.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 24px rgba(12,40,36,0.06);margin-bottom:16px}
+input,textarea,button{font:inherit}
+input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;margin:8px 0}
+textarea{min-height:80px;resize:vertical}
+button{background:var(--accent);color:#fff;border:none;padding:10px 14px;border-radius:10px;cursor:pointer}
+button.muted{background:transparent;color:var(--muted);border:1px solid #eee}
+.admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.row{display:flex;gap:8px}
+ul#list{list-style:none;padding:0;margin:0}
+ul#list li{display:flex;gap:12px;align-items:center;padding:10px;border-bottom:1px solid #f2f2f2}
+ul#list img{width:68px;height:56px;object-fit:cover;border-radius:6px}
+.status{color:var(--muted);margin-top:8px;font-size:0.9rem}
+.file input{display:block;margin-top:8px}
