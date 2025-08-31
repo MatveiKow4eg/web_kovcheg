@@ -318,11 +318,19 @@ body {
   box-shadow: 0 8px 25px rgba(0,0,0,0.15);
   overflow: hidden;
   padding: 10px;
+
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-#cart-dropdown.hidden {
-  display: none;
+#cart-dropdown.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
+
 
 #cart-items {
   list-style: none;
