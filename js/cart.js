@@ -34,7 +34,7 @@ function addToCart(product) {
     });
   }
   saveCart(cart);
-  renderCartWidget(); // Используем единую функцию обновления
+  renderCartWidget(); // обновляем виджет
 }
 
 // Обновление количества товара в корзине
@@ -42,7 +42,7 @@ function updateQty(productId, delta) {
   const cart = getCart();
   const item = cart.find(i => i.id === productId);
   if (!item) return;
-  
+
   item.qty += delta;
   if (item.qty <= 0) {
     const index = cart.findIndex(i => i.id === productId);
@@ -52,37 +52,31 @@ function updateQty(productId, delta) {
   renderCartWidget();
 }
 
-// Единая функция обновления виджета корзины
+// Обновление виджета корзины
 function renderCartWidget() {
   const cart = getCart();
   const countEl = document.getElementById('cart-count');
   const itemsEl = document.getElementById('cart-items');
   const totalEl = document.getElementById('cart-total');
   const goToCartBtn = document.getElementById('go-to-cart');
-  
-  // Если виджет не найден, выходим
+
   if (!countEl) return;
 
-  // Обновляем счетчик
   const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
   countEl.textContent = totalQty;
 
-  // Если нет элементов dropdown, значит мы не на странице с полным виджетом
   if (!itemsEl || !totalEl) return;
 
-  // Обновляем итоговую сумму
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   totalEl.textContent = `Итого: ${totalPrice.toFixed(2)} €`;
 
-  // Очищаем и заполняем список товаров
   itemsEl.innerHTML = '';
-  
+
   if (cart.length === 0) {
     itemsEl.innerHTML = '<li>Корзина пуста</li>';
     if (goToCartBtn) goToCartBtn.style.display = 'none';
   } else {
     if (goToCartBtn) goToCartBtn.style.display = 'block';
-    
     cart.forEach(item => {
       const li = document.createElement('li');
       li.innerHTML = `
@@ -101,24 +95,21 @@ function renderCartWidget() {
       itemsEl.appendChild(li);
     });
 
-    // Добавляем обработчики для кнопок +/-
+    // Обработчики кнопок
     document.querySelectorAll('.qty-btn').forEach(btn => {
-      btn.onclick = null; // Удаляем старые обработчики
+      btn.onclick = null;
       const id = btn.dataset.id;
-      if (btn.classList.contains('plus')) {
-        btn.onclick = () => updateQty(id, 1);
-      } else if (btn.classList.contains('minus')) {
-        btn.onclick = () => updateQty(id, -1);
-      }
+      btn.onclick = btn.classList.contains('plus')
+        ? () => updateQty(id, 1)
+        : () => updateQty(id, -1);
     });
   }
 }
 
 // Создание виджета корзины
 function createCartWidget() {
-  // Проверяем, не создан ли виджет уже
   if (document.getElementById('cart-widget')) return;
-  
+
   const widget = document.createElement('div');
   widget.id = 'cart-widget';
   widget.innerHTML = `
@@ -131,35 +122,32 @@ function createCartWidget() {
   `;
   document.body.appendChild(widget);
 
-  // Обработчик клика по иконке корзины
   document.getElementById('cart-icon').addEventListener('click', () => {
     document.getElementById('cart-dropdown').classList.toggle('hidden');
   });
 
-  // Обработчик перехода в корзину
   document.getElementById('go-to-cart').addEventListener('click', () => {
     window.location.href = 'cart.html';
   });
 
-  // Первоначальное заполнение виджета
   renderCartWidget();
 }
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', async () => {
-  // Создаем виджет корзины на всех страницах
   createCartWidget();
 
-  // Если есть каталог, загружаем товары
   const catalog = document.getElementById('catalog');
   if (catalog) {
     try {
       const products = await getProducts();
 
+      // Очищаем каталог перед рендером
+      catalog.innerHTML = '';
+
       products.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
-
         card.innerHTML = `
           <div class="product-image-container">
             <img class="main-img" src="${product.img || 'optimized_img/main-400.webp'}" alt="${product.name}">
@@ -173,8 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         `;
 
-        const btn = card.querySelector('.buy-btn');
-        btn.addEventListener('click', (e) => {
+        card.querySelector('.buy-btn').addEventListener('click', (e) => {
           e.stopPropagation();
           addToCart(product);
         });
@@ -187,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Экспортируем функции для использования на других страницах
+// Экспортируем функции для других страниц
 window.addToCart = addToCart;
 window.getCart = getCart;
 window.renderCartWidget = renderCartWidget;
