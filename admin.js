@@ -9,7 +9,7 @@ const listEl = document.getElementById('list');
 const clearBtn = document.getElementById('clearBtn');
 
 const CLOUD_NAME = 'do1v7twko';
-const UPLOAD_PRESET = 'products_unsigned'; 
+const UPLOAD_PRESET = 'a7aogzsq'; 
 
 
 const firebaseConfig = {
