@@ -1,6 +1,7 @@
 {
   "version": 2,
   "routes": [
+    { "src": "^/(.*\\.(js|css|png|webp|jpg|ico|svg|json|webmanifest))$", "dest": "/$1" },
     { "src": "^/$", "dest": "/index.html" },
     { "src": "^/locked\\.html$", "dest": "/locked.html" },
     { "src": "^/products/([0-9]+)$", "dest": "/products.html?id=$1" },
