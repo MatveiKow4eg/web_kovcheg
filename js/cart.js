@@ -17,10 +17,23 @@ function saveCart(cart) {
   localStorage.setItem('cart', JSON.stringify(cart));
 }
 
+// Флаг для пульсации один раз
+let cartHasPulsed = false;
+
+// Пульс корзины
+function triggerCartPulse() {
+  const cartIcon = document.getElementById('cart-icon');
+  if (!cartHasPulsed) {
+    cartIcon.classList.add('pulse');
+    cartHasPulsed = true;
+  }
+}
+
 // Добавление товара в корзину
 function addToCart(product) {
   const cart = getCart();
   const existing = cart.find(item => item.id === product.id);
+
   if (existing) {
     existing.qty++;
   } else {
@@ -33,11 +46,14 @@ function addToCart(product) {
       qty: 1
     });
   }
+
   saveCart(cart);
   renderCartWidget();
+
+  triggerCartPulse();
 }
 
-// Обновление количества товара в корзине
+// Обновление количества товара
 function updateQty(productId, delta) {
   const cart = getCart();
   const item = cart.find(i => i.id === productId);
@@ -52,13 +68,14 @@ function updateQty(productId, delta) {
   renderCartWidget();
 }
 
-// Обновление виджета корзины
+// Рендер виджета корзины
 function renderCartWidget() {
   const cart = getCart();
   const countEl = document.getElementById('cart-count');
   const itemsEl = document.getElementById('cart-items');
   const totalEl = document.getElementById('cart-total');
   const goToCartBtn = document.getElementById('go-to-cart');
+  const continueBtn = document.getElementById('continue-shopping');
   const dropdown = document.getElementById('cart-dropdown');
 
   if (!countEl || !itemsEl || !totalEl) return;
@@ -69,15 +86,15 @@ function renderCartWidget() {
   const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   totalEl.textContent = `Итого: ${totalPrice.toFixed(2)} €`;
 
-  // Очищаем список
-  while (itemsEl.firstChild) itemsEl.removeChild(itemsEl.firstChild);
-
+  itemsEl.innerHTML = '';
   if (cart.length === 0) {
     itemsEl.innerHTML = '<li>Корзина пуста</li>';
     if (goToCartBtn) goToCartBtn.style.display = 'none';
-    dropdown.classList.remove('show'); // автоматически скрываем если пусто
+    if (continueBtn) continueBtn.style.display = 'none';
+    dropdown.classList.remove('show');
   } else {
     if (goToCartBtn) goToCartBtn.style.display = 'block';
+    if (continueBtn) continueBtn.style.display = 'block';
     cart.forEach(item => {
       const li = document.createElement('li');
       li.innerHTML = `
@@ -97,12 +114,12 @@ function renderCartWidget() {
     });
   }
 
-  // Навешиваем обработчики на кнопки после рендера
+  // Обработчики кнопок количества
   document.querySelectorAll('.qty-btn').forEach(btn => {
     btn.onclick = null;
     const id = btn.dataset.id;
     btn.onclick = (e) => {
-      e.stopPropagation(); // не закрывает dropdown при клике
+      e.stopPropagation();
       btn.classList.contains('plus') ? updateQty(id, 1) : updateQty(id, -1);
     };
   });
@@ -120,6 +137,7 @@ function createCartWidget() {
       <ul id="cart-items"></ul>
       <div id="cart-total">Итого: 0 €</div>
       <button id="go-to-cart">Перейти в корзину</button>
+      <button id="continue-shopping">Продолжить покупки</button>
     </div>
   `;
   document.body.appendChild(widget);
@@ -128,15 +146,19 @@ function createCartWidget() {
   const dropdown = document.getElementById('cart-dropdown');
 
   icon.addEventListener('click', (e) => {
-    e.stopPropagation(); // чтобы клик не дошел до document
+    e.stopPropagation();
     dropdown.classList.toggle('show');
+    icon.classList.remove('pulse');
   });
 
   document.getElementById('go-to-cart').addEventListener('click', () => {
     window.location.href = 'cart.html';
   });
 
-  // Закрытие при клике вне виджета
+  document.getElementById('continue-shopping').addEventListener('click', () => {
+    dropdown.classList.remove('show'); // просто закрывает корзину
+  });
+
   document.addEventListener('click', (e) => {
     if (!dropdown.contains(e.target) && !icon.contains(e.target)) {
       dropdown.classList.remove('show');
@@ -146,7 +168,7 @@ function createCartWidget() {
   renderCartWidget();
 }
 
-// Инициализация при загрузке страницы
+// Инициализация страницы
 document.addEventListener('DOMContentLoaded', async () => {
   createCartWidget();
 
@@ -168,7 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <h4>${product.name}</h4>
             <p>${product.description}</p>
             <p class="price">${product.price} €</p>
-            <button class="buy-btn" data-id="${product.id}">Купить</button>
+            <button class="buy-btn" data-id="${product.id}">Добавить в корзину</button>
           </div>
         `;
 
@@ -185,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Экспортируем функции для других страниц
+// Экспорт функций
 window.addToCart = addToCart;
 window.getCart = getCart;
 window.renderCartWidget = renderCartWidget;
