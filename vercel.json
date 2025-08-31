@@ -2,11 +2,10 @@
   "version": 2,
   "routes": [
     { "src": "^/$", "dest": "/index.html" },
-    { "src": "^/locked\\.html$", "dest": "/locked.html" },
-    { "src": "^/products/([0-9]+)$", "dest": "/products.html?id=$1" },
+
+    
     { "src": "^/theme$", "status": 308, "headers": { "Location": "/theme.html" } },
-    { "src": "^/([a-zA-Z0-9_-]+)\\.html$", "dest": "/$1" },
-    { "src": "^/([a-zA-Z0-9_-]+)$", "dest": "/$1.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+
+    { "src": "^/([a-zA-Z0-9_-]+)$", "dest": "/$1.html" }
   ]
-}
+} 
