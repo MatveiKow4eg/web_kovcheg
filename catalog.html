@@ -49,10 +49,11 @@
           />
         </div>
         <nav class="main-nav">
-          <a href="index.html" class="active">Главная</a>
+          <a href="index.html">Главная</a>
           <a href="theme.html">Тема</a>
           <a href="about.html">О лагере</a>
           <a href="gallery.html">Галерея</a>
+          <a href="catalog.html" class="active">Мерч</a>
         </nav>
         <button class="burger" aria-label="Открыть меню">
           <span></span><span></span><span></span>
@@ -60,53 +61,15 @@
       </div>
     </header>
 
-    <!-- ХЕРО-БЛОК -->
-    <section class="hero-section">
-      <div class="hero-img-wrap">
-        <img 
-          src="main.webp"
-          srcset="optimized_img/main-400.webp 400w, optimized_img/main-800.webp 800w, optimized_img/main-1200.webp 1200w"
-          sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
-          alt="hero"
-          class="hero-img"
-          fetchpriority="high"
-        />
-        <div class="hero-gradient"></div>
-        <h1 class="hero-title">Ковчег</h1>
-        <div class="hero-subtitle"> 
-          Христианский лагерь, который меняет жизни детей и подростков с 2007 года
-        </div>
-      </div>
-    </section>
+    <!-- КАТАЛОГ -->
+    <main>
+      <section class="catalog-section">
+        <h1 class="section-title">Каталог товаров</h1>
+        <div class="catalog-grid" id="catalog"></div>
+      </section>
+    </main>
+  </div>
 
-    <!-- product-scroll-panel -->
-    <section class="product-scroll-section">
-      <div class="scroll-container">
-        <div class="scroll-header">
-          <button class="scroll-arrow scroll-left" aria-label="Предыдущие товары">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="scroll-title-section">
-            <h2 class="scroll-title">Наши товары</h2>
-            <a href="#" class="scroll-subtitle">Смотреть все</a>
-          </div>
-          <button class="scroll-arrow scroll-right" aria-label="Следующие товары">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-        <div class="products-scroll-wrapper">
-          <div class="products-scroll-track" id="productsScrollTrack">
-            <!-- Product cards will be inserted here by JavaScript -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    
 <footer class="site-footer">
   <!-- Призыв к пожертвованию -->
   <div class="donation-callout">
@@ -176,7 +139,7 @@
     </div>
   </div>
 </div>
-
+<script src="js/catalog.js"></script>
 <script>
   function handleZohoSubmit(e) {
     const form = e.target;
@@ -199,6 +162,4 @@
   }
 </script>
 
-<script src="js/catalog.js"></script>
-
-</html>
+</body>
