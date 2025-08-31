@@ -64,11 +64,12 @@
     <!-- КАТАЛОГ -->
     <main>
       <section class="catalog-section">
-        <h1 class="section-title">Каталог товаров</h1>
+        <h1 class="section-title"></h1>
         <div class="catalog-grid" id="catalog"></div>
       </section>
     </main>
   </div>
+
 
 <footer class="site-footer">
   <!-- Призыв к пожертвованию -->
@@ -139,7 +140,10 @@
     </div>
   </div>
 </div>
-<script src="js/catalog.js"></script>
+<script type="module" src="js/firebase.js"></script>
+<script type="module" src="js/catalog.js"></script>
+<script type="module" src="js/cart.js"></script>
+
 <script>
   function handleZohoSubmit(e) {
     const form = e.target;
