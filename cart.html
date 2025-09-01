@@ -132,7 +132,7 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-const stripe = Stripe("PUT_YOUR_STRIPE_PUBLISHABLE_KEY_HERE"); // берём из env на фронте
+const stripe = Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 function getCart() {
   return JSON.parse(localStorage.getItem('cart')) || [];
