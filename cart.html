@@ -132,7 +132,8 @@
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-const stripe = Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+const stripe = Stripe("pk_live_51S2bw62dslCM0UdAz4BkW6xCrnJMHTQgkLTUtgJwp4V4zG6x75ZS18avDR2h0yPHNnuXbxlkDia9tWuf2tj8cQmC005sxeVPOq");
+
 
 function getCart() {
   return JSON.parse(localStorage.getItem('cart')) || [];
