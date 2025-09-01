@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY); // секретный ключ берём из Vercel env
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -21,8 +21,8 @@ export default async function handler(req, res) {
         },
         quantity: item.qty,
       })),
-      success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.origin}/cancel`,
+      success_url: `${req.headers.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.origin}/cancel.html`,
     });
 
     res.json({ id: session.id, url: session.url });
