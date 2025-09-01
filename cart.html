@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Корзина</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #f9f9f9;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #ff7847;
+  }
+  .cart-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  }
+  .cart-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 0;
+  }
+  .cart-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  .cart-item-info {
+    flex: 1;
+  }
+  .cart-item-info h4 {
+    margin: 0 0 4px;
+    font-size: 16px;
+  }
+  .cart-item-info p {
+    margin: 2px 0;
+    font-size: 14px;
+    color: #666;
+  }
+  .cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .qty-btn {
+    width: 28px;
+    height: 28px;
+    background: #ff7847;
+    border: none;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .qty-btn:hover {
+    background: #e85a2b;
+  }
+  .cart-summary {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .cart-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .cart-actions button {
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .continue-btn {
+    background: #ccc;
+    color: #333;
+  }
+  .continue-btn:hover {
+    background: #bbb;
+  }
+  .checkout-btn {
+    background: #ff7847;
+    color: #fff;
+  }
+  .checkout-btn:hover {
+    background: #e85a2b;
+  }
+  @media (max-width: 600px) {
+    .cart-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .cart-item img {
+      width: 100%;
+      height: auto;
+    }
+    .cart-actions {
+      flex-direction: column;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Ваша корзина</h1>
+<div class="cart-container">
+  <div id="cart-items"></div>
+  <div class="cart-summary" id="cart-total">Итого: 0 €</div>
+  <div class="cart-actions">
+    <button class="continue-btn" id="continue-shopping">Продолжить покупки</button>
+    <button class="checkout-btn" id="checkout-btn">Оплатить</button>
+  </div>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+const stripe = Stripe("PUT_YOUR_STRIPE_PUBLISHABLE_KEY_HERE"); // берём из env на фронте
+
+function getCart() {
+  return JSON.parse(localStorage.getItem('cart')) || [];
+}
+
+function saveCart(cart) {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function renderCart() {
+  const cart = getCart();
+  const container = document.getElementById('cart-items');
+  const totalEl = document.getElementById('cart-total');
+  container.innerHTML = '';
+
+  if(cart.length === 0){
+    container.innerHTML = '<p>Корзина пуста</p>';
+    totalEl.textContent = 'Итого: 0 €';
+    return;
+  }
+
+  let total = 0;
+  cart.forEach(item => {
+    total += item.price * item.qty;
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <img src="${item.img}" alt="${item.name}">
+      <div class="cart-item-info">
+        <h4>${item.name}</h4>
+        <p>Цена: ${item.price} €</p>
+        <div class="cart-item-controls">
+          <button class="qty-btn minus" data-id="${item.id}">-</button>
+          <span>${item.qty}</span>
+          <button class="qty-btn plus" data-id="${item.id}">+</button>
+        </div>
+        <p>Итого: ${(item.price * item.qty).toFixed(2)} €</p>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+  totalEl.textContent = `Итого: ${total.toFixed(2)} €`;
+
+  // кнопки +
+  document.querySelectorAll('.qty-btn').forEach(btn => {
+    const id = btn.dataset.id;
+    btn.onclick = () => {
+      const cart = getCart();
+      const item = cart.find(i => i.id === id);
+      if(!item) return;
+      if(btn.classList.contains('plus')) item.qty++;
+      if(btn.classList.contains('minus')) item.qty--;
+      if(item.qty <= 0) {
+        const index = cart.findIndex(i => i.id === id);
+        cart.splice(index,1);
+      }
+      saveCart(cart);
+      renderCart();
+    };
+  });
+}
+
+// Продолжить покупки
+document.getElementById('continue-shopping').addEventListener('click', () => {
+  window.location.href = '/index.html';
+});
+
+// Оплата
+document.getElementById('checkout-btn').addEventListener('click', async () => {
+  const cart = getCart();
+  if(cart.length === 0) return alert("Корзина пуста");
+
+  const res = await fetch('/api/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json' },
+    body: JSON.stringify({ items: cart })
+  });
+  const data = await res.json();
+  if(data.url) {
+    window.location.href = data.url;
+  }
+});
+
+// инициализация
+renderCart();
+</script>
+
+</body>
+</html>
