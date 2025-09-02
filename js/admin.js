@@ -1,268 +1,209 @@
- import { db, auth } from './firebase.js';
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
-import { collection, getDocs, orderBy, query, updateDoc, doc, addDoc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
+// admin.js - админка с Firebase Auth + Firestore + Cloudinary (две картинки)
+const loginForm = document.getElementById('loginForm');
+const authSection = document.getElementById('authSection');
+const adminSection = document.getElementById('adminSection');
+const logoutBtn = document.getElementById('logoutBtn');
+const productForm = document.getElementById('productForm');
+const statusEl = document.getElementById('status');
+const listEl = document.getElementById('list');
+const clearBtn = document.getElementById('clearBtn');
 
-const fmt = new Intl.NumberFormat('ru-EE', { style: 'currency', currency: 'EUR' });
+const CLOUD_NAME = 'do1v7twko';
+const UPLOAD_PRESET = 'a7aogzsq';
 
-let editingId = null; // текущий редактируемый товар (для admin/admin.html)
+const firebaseConfig = {
+  apiKey: "AIzaSyDHNEIG6WOriQVmsxSJ9GkLQOluizstaYI",
+  authDomain: "kovchegee.firebaseapp.com",
+  projectId: "kovchegee",
+  storageBucket: "kovchegee.firebasestorage.app",
+  messagingSenderId: "576183567033",
+  appId: "1:576183567033:web:52c9a991cb4038ba40d168",
+  measurementId: "G-2G1M4MT7M6"
+};
 
-function bindAuthUI() {
-  const authSec = document.getElementById('authSection');
-  const adminSec = document.getElementById('adminSection');
-  const loginForm = document.getElementById('loginForm');
-  const logoutBtn = document.getElementById('logoutBtn');
+let auth, db;
 
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      authSec.hidden = true;
-      adminSec.hidden = false;
-      await initData();
-      bindProductFormUI();
-    } else {
-      adminSec.hidden = true;
-      authSec.hidden = false;
-    }
+// Инициализация Firebase
+async function initFirebase() {
+  const { initializeApp } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js');
+  const authMod = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js');
+  const dbMod = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+
+  initializeApp(firebaseConfig);
+  auth = authMod.getAuth();
+  db = dbMod.getFirestore();
+
+  authMod.onAuthStateChanged(auth, user => {
+    if (user) showAdmin();
+    else showAuth();
   });
-
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = /** @type {HTMLInputElement} */(document.getElementById('email')).value.trim();
-      const password = /** @type {HTMLInputElement} */(document.getElementById('password')).value;
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (e) {
-        console.error('Auth error', e);
-        alert('Неверный логин или пароль');
-      }
-    });
-  }
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      await signOut(auth);
-    });
-  }
 }
 
-function bindProductFormUI() {
-  const form = document.getElementById('productForm');
-  if (!form) return; // страница pages/admin.html — там другая форма (таблица)
+function showAuth() {
+  authSection.hidden = false;
+  adminSection.hidden = true;
+}
 
-  const statusEl = document.getElementById('status');
-  const clearBtn = document.getElementById('clearBtn');
+function showAdmin() {
+  authSection.hidden = true;
+  adminSection.hidden = false;
+  loadProducts();
+}
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = /** @type {HTMLInputElement} */(document.getElementById('p_name')).value.trim();
-    const description = /** @type {HTMLTextAreaElement} */(document.getElementById('p_description')).value.trim();
-    const priceVal = Number(/** @type {HTMLInputElement} */(document.getElementById('p_price')).value);
-    const overlay = /** @type {HTMLInputElement} */(document.getElementById('p_overlay')).value.trim();
-    const file = /** @type {HTMLInputElement} */(document.getElementById('p_file')).files?.[0] || null;
-    const hoverFile = /** @type {HTMLInputElement} */(document.getElementById('p_hover_file')).files?.[0] || null;
-
-    if (!name) return alert('Введите название');
-    if (!Number.isFinite(priceVal) || priceVal < 0.5) return alert('Цена должна быть не меньше 0.50 €');
-
-    try {
-      setStatus('Сохраняем...', '');
-      const data = { name, description, price: priceVal };
-      if (overlay) data.overlay = overlay;
-
-      // Загрузка файлов в Firebase Storage (если есть)
-      const storage = getStorage();
-      const uploads = [];
-      if (file) {
-        const path = `products/${Date.now()}_${sanitizeFileName(file.name)}`;
-        uploads.push(uploadAndGetURL(storage, path, file).then((url) => { data.img = url; }));
-      }
-      if (hoverFile) {
-        const path = `products/${Date.now()}_hover_${sanitizeFileName(hoverFile.name)}`;
-        uploads.push(uploadAndGetURL(storage, path, hoverFile).then((url) => { data.hoverImg = url; }));
-      }
-      if (uploads.length) await Promise.all(uploads);
-
-      if (editingId) {
-        await setDoc(doc(db, 'products', editingId), data, { merge: true });
-      } else {
-        await addDoc(collection(db, 'products'), data);
-      }
-
-      setStatus('Готово', 'success');
-      clearForm();
-      await loadProductsListUL();
-      await loadProductsEditor();
-    } catch (err) {
-      console.error('Save product error', err);
-      setStatus('Ошибка сохранения', 'error');
-    }
-  });
-
-  if (clearBtn) {
-    clearBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      clearForm();
-      setStatus('', '');
-    });
+// Вход/выход
+loginForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  status('Вход...');
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  try {
+    const { signInWithEmailAndPassword, getAuth } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js');
+    await signInWithEmailAndPassword(getAuth(), email, password);
+    status('Вход выполнен');
+  } catch (err) {
+    console.error(err);
+    status('Ошибка входа: ' + (err.message || err));
   }
+});
 
-  function clearForm() {
-    editingId = null;
-    /** @type {HTMLFormElement} */(form).reset();
-  }
+logoutBtn.addEventListener('click', async () => {
+  const { signOut, getAuth } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js');
+  await signOut(getAuth());
+  status('Выход выполнен');
+});
 
-  function setStatus(text, kind) {
-    if (!statusEl) return;
-    statusEl.textContent = text;
-    statusEl.className = `status ${kind || ''}`;
-  }
+// Загрузка в Cloudinary
+async function uploadToCloudinary(file) {
+  if (!file) return null;
+  const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`;
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', UPLOAD_PRESET);
+  const res = await fetch(url, { method: 'POST', body: fd });
+  if (!res.ok) throw new Error('Upload failed: ' + res.statusText);
+  const data = await res.json();
+  return data.secure_url;
 }
 
-async function uploadAndGetURL(storage, path, file) {
-  const r = storageRef(storage, path);
-  await uploadBytes(r, file, { contentType: file.type });
-  return await getDownloadURL(r);
-}
-
-function sanitizeFileName(name) {
-  return name.replace(/[^a-zA-Z0-9_.-]/g, '_');
-}
-
-async function initData() {
-  // Загружаем то, что доступно на текущей странице
-  try { await loadOrdersAgg(); } catch (e) { console.error('Load orders error', e); }
-  try { await loadProductsEditor(); } catch (e) { console.error('Load products table error', e); }
-  try { await loadProductsListUL(); } catch (e) { console.error('Load products list error', e); }
-}
-
-async function loadOrdersAgg() {
-  // Агрегацию берём с сервера, чтобы не нарушать Firestore Rules
-  const elOrders = document.getElementById('stat-orders');
-  const elRevenue = document.getElementById('stat-revenue');
-  const elQty = document.getElementById('stat-qty');
-  const tbody = document.querySelector('#sold-table tbody');
+// Добавление нового товара
+productForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  status('Сохранение...');
 
   try {
-    const user = auth.currentUser;
-    if (!user) return;
-    const token = await user.getIdToken();
-    const res = await fetch('/api/admin-orders', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) throw new Error(`admin-orders ${res.status}`);
-    const data = await res.json();
+    const name = document.getElementById('p_name').value.trim();
+    const description = document.getElementById('p_description').value.trim();
+    const price = parseFloat(document.getElementById('p_price').value) || 0;
+    const overlay = document.getElementById('p_overlay').value.trim() || null;
+    const mainFile = document.getElementById('p_file').files[0];
+    const hoverFile = document.getElementById('p_hover_file').files[0];
 
-    if (elOrders) elOrders.textContent = String(data.totalOrders || 0);
-    if (elRevenue) elRevenue.textContent = fmt.format(Number(data.totalRevenue || 0));
-    if (elQty) elQty.textContent = String(data.totalQty || 0);
+    let imgUrl = '';
+    let hoverImgUrl = '';
 
-    if (tbody) {
-      tbody.innerHTML = '';
-      (data.items || []).forEach((it) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${escapeHtml(it.name)}</td>
-          <td>${it.qty}</td>
-          <td>${fmt.format(Number(it.revenue || 0))}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+    if (mainFile) {
+      status('Загрузка основной картинки...');
+      imgUrl = await uploadToCloudinary(mainFile);
     }
-  } catch (e) {
-    console.error('Load orders error', e);
+
+    if (hoverFile) {
+      status('Загрузка картинки для hover...');
+      hoverImgUrl = await uploadToCloudinary(hoverFile);
+    }
+
+    const { addDoc, collection } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+    await addDoc(collection(db, 'products'), {
+      name,
+      description,
+      price,
+      overlay,
+      img: imgUrl || '',
+      hoverImg: hoverImgUrl || '',
+      createdAt: new Date()
+    });
+
+    status('Товар сохранён');
+    productForm.reset();
+    loadProducts();
+
+  } catch (err) {
+    console.error(err);
+    status('Ошибка: ' + (err.message || err));
+  }
+});
+
+clearBtn.addEventListener('click', () => productForm.reset());
+
+// Загрузка списка товаров
+async function loadProducts() {
+  listEl.innerHTML = '<li>Загрузка...</li>';
+  try {
+    const { collection, getDocs, doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+    const snap = await getDocs(collection(db, 'products'));
+    listEl.innerHTML = '';
+
+    snap.forEach(d => {
+      const data = d.data();
+      const li = document.createElement('li');
+      li.style.display = 'flex';
+      li.style.alignItems = 'center';
+      li.style.gap = '12px';
+      li.style.marginBottom = '10px';
+
+      const mainImg = document.createElement('img');
+      mainImg.src = data.img || 'optimized_img/main-400.webp';
+      mainImg.alt = data.name || '';
+      mainImg.style.width = '60px';
+      mainImg.style.height = '60px';
+      mainImg.style.objectFit = 'cover';
+      mainImg.style.borderRadius = '6px';
+
+      const hoverImg = document.createElement('img');
+      hoverImg.src = data.hoverImg || '';
+      hoverImg.alt = data.name + ' hover';
+      hoverImg.style.width = '60px';
+      hoverImg.style.height = '60px';
+      hoverImg.style.objectFit = 'cover';
+      hoverImg.style.borderRadius = '6px';
+      hoverImg.style.opacity = '0.7';
+
+      const meta = document.createElement('div');
+      meta.style.flex = '1';
+      meta.innerHTML = `
+        <strong>${escapeHtml(data.name)}</strong>
+        <div style="color:#6b7a74;font-size:0.9rem">${escapeHtml(data.description || '')}</div>
+        <div style="font-weight:800;margin-top:6px">${data.price} €</div>
+      `;
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Удалить';
+      delBtn.className = 'muted';
+      delBtn.addEventListener('click', async () => {
+        if (!confirm('Удалить товар?')) return;
+        await deleteDoc(doc(db, 'products', d.id));
+        loadProducts();
+      });
+
+      li.appendChild(mainImg);
+      li.appendChild(hoverImg);
+      li.appendChild(meta);
+      li.appendChild(delBtn);
+      listEl.appendChild(li);
+    });
+
+    if (!listEl.children.length) listEl.innerHTML = '<li>Нет товаров</li>';
+
+  } catch (err) {
+    console.error(err);
+    listEl.innerHTML = '<li>Ошибка загрузки</li>';
   }
 }
 
-async function loadProductsEditor() {
-  const table = document.querySelector('#products-table tbody');
-  if (!table) return; // на admin/admin.html таблицы нет
-  const snap = await getDocs(collection(db, 'products'));
-  const tbody = table;
-  tbody.innerHTML = '';
-  snap.forEach(d => {
-    const p = d.data();
-    const id = d.id;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${escapeHtml(id)}</td>
-      <td>${escapeHtml(p.name || '')}</td>
-      <td><input class="input" type="number" step="0.01" min="0" value="${Number(p.price || 0).toFixed(2)}" data-id="${id}" /></td>
-      <td><button class="btn ok" data-action="save" data-id="${id}">Сохранить</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
+function status(txt) { statusEl.textContent = txt || ''; }
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-  tbody.querySelectorAll('button[data-action="save"]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.id;
-      const input = tbody.querySelector(`input[data-id="${CSS.escape(id)}"]`);
-      const val = Number(input.value);
-      if (!Number.isFinite(val) || val < 0.5) {
-        alert('Цена должна быть не меньше 0.50 €');
-        return;
-      }
-      btn.disabled = true;
-      try {
-        await updateDoc(doc(db, 'products', id), { price: val });
-        btn.textContent = 'Готово';
-        setTimeout(() => (btn.textContent = 'Сохранить'), 2000);
-      } catch (e) {
-        console.error('Update price error', e);
-        alert('Не удалось сохранить цену');
-      } finally {
-        btn.disabled = false;
-      }
-    });
-  });
-}
-
-// Рендер списка товаров для admin/admin.html (ul#list)
-async function loadProductsListUL() {
-  const list = document.getElementById('list');
-  if (!list) return;
-  const snap = await getDocs(collection(db, 'products'));
-  list.innerHTML = '';
-  snap.forEach(d => {
-    const p = d.data();
-    const li = document.createElement('li');
-    li.dataset.id = d.id;
-    const price = Number(p.price || 0);
-    li.textContent = `${p.name || d.id} — ${price.toFixed(2)} €`;
-    li.style.cursor = 'pointer';
-    li.title = 'Нажмите, чтобы отредактировать';
-    li.addEventListener('click', async () => {
-      // Заполнить форму данными товара для редактирования
-      try {
-        const snap = await getDoc(doc(db, 'products', d.id));
-        if (!snap.exists()) return;
-        const prod = snap.data();
-        editingId = d.id;
-        const fName = /** @type {HTMLInputElement} */(document.getElementById('p_name'));
-        const fDesc = /** @type {HTMLTextAreaElement} */(document.getElementById('p_description'));
-        const fPrice = /** @type {HTMLInputElement} */(document.getElementById('p_price'));
-        const fOverlay = /** @type {HTMLInputElement} */(document.getElementById('p_overlay'));
-        if (fName) fName.value = prod.name || '';
-        if (fDesc) fDesc.value = prod.description || '';
-        if (fPrice) fPrice.value = Number(prod.price || 0).toFixed(2);
-        if (fOverlay) fOverlay.value = prod.overlay || '';
-      } catch (e) {
-        console.error('Prefill product error', e);
-      }
-    });
-    list.appendChild(li);
-  });
-}
-
-function escapeHtml(s) {
-  return String(s)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
-}
-
-(function init() {
-  bindAuthUI();
-})();
+// Старт
+initFirebase().catch(err => {
+  console.error('Init Firebase failed', err);
+  status('Не удалось инициализировать Firebase: ' + (err.message || err));
+});

@@ -11,8 +11,8 @@
     <section id="authSection">
       <h2>Вход для администратора</h2>
       <form id="loginForm">
-        <input type="email" id="email" placeholder="Email" required autocomplete="username" />
-        <input type="password" id="password" placeholder="Пароль" required autocomplete="current-password" />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Пароль" required />
         <button type="submit">Войти</button>
       </form>
     </section>
@@ -30,13 +30,11 @@
         <input name="price" id="p_price" type="number" step="0.01" placeholder="Цена" required />
         <input name="overlay" id="p_overlay" placeholder="Бейдж (Популярное, Новинка) — необяз." />
         <label class="file">
-          Изображение (файл, опционально)
+          Изображение
           <input id="p_file" type="file" accept="image/*" />
         </label>
-        <input id="p_img_url" placeholder="ИЛИ вставьте URL изображения (https://...)" />
-        <label>Картинка при наведении (файл, опционально)</label>
-        <input type="file" id="p_hover_file" accept="image/*">
-        <input id="p_hover_url" placeholder="ИЛИ вставьте URL hover-изображения (https://...)" />
+        <label>Картинка при наведении</label>
+<input type="file" id="p_hover_file" accept="image/*">
         <div class="row">
           <button type="submit">Сохранить товар</button>
           <button type="button" id="clearBtn" class="muted">Очистить</button>
@@ -51,6 +49,6 @@
     </section>
   </main>
 
-  <script type="module" src="/js/admin.js"></script>
+  <script type="module" src="js/admin.js"></script>
 </body>
 </html>
