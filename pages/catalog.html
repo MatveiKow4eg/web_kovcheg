@@ -70,100 +70,92 @@
     </main>
   </div>
 
-
-<footer class="site-footer">
-  <!-- Призыв к пожертвованию -->
-  <div class="donation-callout">
-    <h2 class="donation-title">
-      Помоги нам превратить маленькие шаги в большие перемены
-    </h2>
-    <p class="donation-text">
-      Твоё пожертвование помогает осуществлять проекты для детей и подростков города Кохтла-Ярве
-    </p>
-    <a href="donate.html" class="donation-button">Пожертвовать</a>
-  </div>
-
-  <!-- Основной блок футера -->
-  <div class="footer-container">
-    <div class="footer-brand">
-      <p class="brand-title">КОВЧЕГ</p>
-      <p class="brand-subtitle">
-        Христианский лагерь<br>Меняем жизни подростков с 2007 года
+ <footer class="site-footer">
+    <!-- Призыв к пожертвованию -->
+    <div class="donation-callout">
+      <h2 class="donation-title">
+        Помоги нам превратить маленькие шаги в большие перемены
+      </h2>
+      <p class="donation-text">
+        Твоё пожертвование помогает осуществлять проекты для детей и подростков города Кохтла-Ярве
       </p>
+      <a href="donate.html" class="donation-button">Пожертвовать</a>
     </div>
 
-    <div class="footer-links">
-      <h4>Навигация</h4>
-      <ul>
-        <li><a href="about.html">О лагере</a></li>
-        <li><a href="#program">Программа</a></li>
-        <li><a href="#team">Команда</a></li>
-        <li><a href="#gallery">Галерея</a></li>
-        <li><a href="#contact">Контакты</a></li>
-      </ul>
-    </div>
+    <!-- Основной блок футера -->
+    <div class="footer-container">
+      <div class="footer-brand">
+        <p class="brand-title">КОВЧЕГ</p>
+        <p class="brand-subtitle">
+          Христианский лагерь<br>Меняем жизни подростков с 2007 года
+        </p>
+      </div>
 
-    <div class="footer-subscribe">
-     <!-- Форма подписки Zoho без редиректа -->
-<div id="customForm">
-  <div class="quick_form_9_css" name="SIGNUP_BODY">
-    <div>
- <form method="POST" id="zcampaignOptinForm"
-      class="subscribe-form"
-      action="https://zcv2-zcmp.maillist-manage.eu/weboptin.zc"
-      target="_zcSignup" onsubmit="return handleZohoSubmit(event)">
+      <div class="footer-links">
+        <h4>Навигация</h4>
+        <ul>
+          <li><a href="about.html">О лагере</a></li>
+          <li><a href="#program">Программа</a></li>
+          <li><a href="#team">Команда</a></li>
+          <li><a href="#gallery">Галерея</a></li>
+          <li><a href="#contact">Контакты</a></li>
+        </ul>
+      </div>
 
-        <input type="email" placeholder="Твой email"
-               name="CONTACT_EMAIL" id="EMBED_FORM_EMAIL_LABEL"
-               required autocomplete="email">
-        <button type="submit" id="zcWebOptin">Подписаться</button>
+ <div class="footer-subscribe">
+  <!-- Заголовок -->
+  <h4>Будь в курсе новостей</h4>
 
-        <!-- обязательно оставить -->
-        <input type="hidden" name="submitType" value="optinCustomView">
-        <input type="hidden" name="formType" value="QuickForm">
-        <input type="hidden" name="zx" value="14ae8a0a52">
-        <input type="hidden" name="zcvers" value="2.0">
-        <input type="hidden" name="zcld" value="137f52ab567e232c">
-        <input type="hidden" name="zctd" value="137f52ab567e2159">
-        <input type="hidden" name="zc_trackCode" value="ZCFORMVIEW">
-        <input type="hidden" name="zc_formIx" value="3z6c745ef0445f9804718e04ce42a145a33f5b787fd7b5560df550eeefb918b8fa">
-        <input type="hidden" name="scriptless" value="yes">
-      </form>
+  <!-- Форма подписки Zoho -->
+  <div id="customForm">
+    <div class="quick_form_9_css" name="SIGNUP_BODY">
+      <div>
+        <form method="POST" id="zcampaignOptinForm"
+              class="subscribe-form"
+              action="https://zcv2-zcmp.maillist-manage.eu/weboptin.zc"
+              target="_zcSignup" onsubmit="return handleZohoSubmit(event)">
+          <input type="email" placeholder="Твой email"
+                 name="CONTACT_EMAIL" id="EMBED_FORM_EMAIL_LABEL"
+                 required autocomplete="email">
+          <button type="submit" id="zcWebOptin">Подписаться</button>
 
-      <!-- скрытый iframe для приёма ответа -->
-      <iframe name="_zcSignup" id="zc_iframe" style="display:none;"></iframe>
+          <!-- скрытые поля обязательные -->
+          <input type="hidden" name="submitType" value="optinCustomView">
+          <input type="hidden" name="formType" value="QuickForm">
+          <input type="hidden" name="zx" value="14ae8a0a52">
+          <input type="hidden" name="zcvers" value="2.0">
+          <input type="hidden" name="zcld" value="137f52ab567e232c">
+          <input type="hidden" name="zctd" value="137f52ab567e2159">
+          <input type="hidden" name="zc_trackCode" value="ZCFORMVIEW">
+          <input type="hidden" name="zc_formIx" value="3z6c745ef0445f9804718e04ce42a145a33f5b787fd7b5560df550eeefb918b8fa">
+          <input type="hidden" name="scriptless" value="yes">
+        </form>
 
-      <!-- локальное сообщение успеха -->
-      <div id="localSignupSuccess" style="display:none; margin-top:10px;">
-        Спасибо! Проверь почту и подтверди подписку.
+        <!-- скрытый iframe -->
+        <iframe name="_zcSignup" id="zc_iframe" style="display:none;"></iframe>
+
+        <!-- локальное сообщение -->
+        <div id="localSignupSuccess" style="display:none; margin-top:10px;">
+          Спасибо! Проверь почту и подтверди подписку.
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Текст политики конфиденциальности -->
+  <p class="privacy-text" style="margin-top:10px;">
+    Подписываясь, ты соглашаешься с <a href="#">политикой конфиденциальности</a>.
+  </p>
 </div>
+
+    </div>
+    <div class="footer-media-logo">
+  <img src="/public/kovchegmedia.webp" alt="Kovcheg Media Team">
+</div>  
+  </footer>
+
 <script type="module" src="/js/firebase.js"></script>
 <script type="module" src="/js/catalog.js"></script>
 <script type="module" src="/js/cart.js"></script>
-
-<script>
-  function handleZohoSubmit(e) {
-    const form = e.target;
-    const btn  = document.getElementById('zcWebOptin');
-    const iframe = document.getElementById('zc_iframe');
-    const success = document.getElementById('localSignupSuccess');
-
-    // блокируем повторные клики
-    btn.disabled = true;
-
-    // Когда Zoho ответит в скрытый iframe — показываем "спасибо"
-    const onLoad = () => {
-      form.style.display = 'none';
-      success.style.display = 'block';
-    };
-    iframe.addEventListener('load', onLoad, { once: true });
-
-    // отправляем форму как есть
-    return true; // важно: не отменяем submit
-  }
-</script>
-
 </body>
+</html>

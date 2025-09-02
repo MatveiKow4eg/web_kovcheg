@@ -1552,7 +1552,7 @@ background: linear-gradient(125deg, rgba(213, 195, 219, 1) 0%, rgba(175, 181, 21
 .footer-media-logo {
   position: absolute;
   right: 20px;
-  bottom: 80px; /* было 20px, подняли выше */
+  bottom: 50px; /* было 20px, подняли выше */
 }
 
 .footer-media-logo img {
