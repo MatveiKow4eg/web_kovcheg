@@ -43,8 +43,10 @@ function bindAuthUI() {
 }
 
 async function initData() {
-  await loadOrdersAgg();
-  await loadProductsEditor();
+  // Загружаем то, что доступно на текущей странице
+  try { await loadOrdersAgg(); } catch (e) { console.error('Load orders error', e); }
+  try { await loadProductsEditor(); } catch (e) { console.error('Load products table error', e); }
+  try { await loadProductsListUL(); } catch (e) { console.error('Load products list error', e); }
 }
 
 async function loadOrdersAgg() {
@@ -60,7 +62,6 @@ async function loadOrdersAgg() {
     const o = d.data();
     if (!o || o.status !== 'paid') return;
     totalOrders += 1;
-    const currency = (o.currency || 'eur').toUpperCase();
     totalRevenue += Number(o.total || 0);
 
     const items = Array.isArray(o.items) ? o.items : [];
@@ -76,11 +77,15 @@ async function loadOrdersAgg() {
     }
   });
 
-  document.getElementById('stat-orders').textContent = String(totalOrders);
-  document.getElementById('stat-revenue').textContent = fmt.format(totalRevenue);
-  document.getElementById('stat-qty').textContent = String(totalQty);
+  const elOrders = document.getElementById('stat-orders');
+  const elRevenue = document.getElementById('stat-revenue');
+  const elQty = document.getElementById('stat-qty');
+  if (elOrders) elOrders.textContent = String(totalOrders);
+  if (elRevenue) elRevenue.textContent = fmt.format(totalRevenue);
+  if (elQty) elQty.textContent = String(totalQty);
 
   const tbody = document.querySelector('#sold-table tbody');
+  if (!tbody) return; // на admin/admin.html этой таблицы нет
   tbody.innerHTML = '';
   for (const [name, v] of byItem.entries()) {
     const tr = document.createElement('tr');
@@ -94,8 +99,10 @@ async function loadOrdersAgg() {
 }
 
 async function loadProductsEditor() {
+  const table = document.querySelector('#products-table tbody');
+  if (!table) return; // на admin/admin.html таблицы нет
   const snap = await getDocs(collection(db, 'products'));
-  const tbody = document.querySelector('#products-table tbody');
+  const tbody = table;
   tbody.innerHTML = '';
   snap.forEach(d => {
     const p = d.data();
@@ -131,6 +138,21 @@ async function loadProductsEditor() {
         btn.disabled = false;
       }
     });
+  });
+}
+
+// Рендер списка товаров для admin/admin.html (ul#list)
+async function loadProductsListUL() {
+  const list = document.getElementById('list');
+  if (!list) return;
+  const snap = await getDocs(collection(db, 'products'));
+  list.innerHTML = '';
+  snap.forEach(d => {
+    const p = d.data();
+    const li = document.createElement('li');
+    const price = Number(p.price || 0);
+    li.textContent = `${p.name || d.id} — ${price.toFixed(2)} €`;
+    list.appendChild(li);
   });
 }
 
