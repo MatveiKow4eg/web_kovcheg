@@ -190,6 +190,14 @@ async function loadProducts() {
         loadProducts();
       });
 
+      // Вставляем элементы в DOM до поиска кнопки сохранения
+      li.appendChild(mainImg);
+      li.appendChild(hoverImg);
+      li.appendChild(meta);
+      li.appendChild(delBtn);
+      listEl.appendChild(li);
+
+      // Теперь найдём кнопку и привяжем обработчик
       const saveBtn = li.querySelector('.save-price');
       if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
@@ -212,12 +220,6 @@ async function loadProducts() {
           }
         });
       }
-
-      li.appendChild(mainImg);
-      li.appendChild(hoverImg);
-      li.appendChild(meta);
-      li.appendChild(delBtn);
-      listEl.appendChild(li);
     });
 
     if (!listEl.children.length) listEl.innerHTML = '<li>Нет товаров</li>';
