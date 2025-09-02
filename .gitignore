@@ -1,2 +1,18 @@
-CLAUDE.md
+# Dependencies
+node_modules/
+
+# Vercel local settings
 .vercel
+
+# OS and logs
+.DS_Store
+*.log
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Misc
+CLAUDE.md
+.qodo/
