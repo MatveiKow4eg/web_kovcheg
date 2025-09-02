@@ -1,4 +1,4 @@
-import { db, auth } from './firebase.js';
+ import { db, auth } from './firebase.js';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 import { collection, getDocs, orderBy, query, updateDoc, doc, addDoc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
@@ -137,51 +137,40 @@ async function initData() {
 }
 
 async function loadOrdersAgg() {
-  const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-
-  let totalOrders = 0;
-  let totalRevenue = 0;
-  let totalQty = 0;
-  const byItem = new Map(); // key: name, value: { qty, revenue }
-
-  snap.forEach(d => {
-    const o = d.data();
-    if (!o || o.status !== 'paid') return;
-    totalOrders += 1;
-    totalRevenue += Number(o.total || 0);
-
-    const items = Array.isArray(o.items) ? o.items : [];
-    for (const it of items) {
-      const name = String(it.name || 'Товар');
-      const qty = Number(it.quantity || 0);
-      const amount = Number(it.amount_total || 0);
-      totalQty += qty;
-      const prev = byItem.get(name) || { qty: 0, revenue: 0 };
-      prev.qty += qty;
-      prev.revenue += amount;
-      byItem.set(name, prev);
-    }
-  });
-
+  // Агрегацию берём с сервера, чтобы не нарушать Firestore Rules
   const elOrders = document.getElementById('stat-orders');
   const elRevenue = document.getElementById('stat-revenue');
   const elQty = document.getElementById('stat-qty');
-  if (elOrders) elOrders.textContent = String(totalOrders);
-  if (elRevenue) elRevenue.textContent = fmt.format(totalRevenue);
-  if (elQty) elQty.textContent = String(totalQty);
-
   const tbody = document.querySelector('#sold-table tbody');
-  if (!tbody) return; // на admin/admin.html этой таблицы нет
-  tbody.innerHTML = '';
-  for (const [name, v] of byItem.entries()) {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${escapeHtml(name)}</td>
-      <td>${v.qty}</td>
-      <td>${fmt.format(v.revenue)}</td>
-    `;
-    tbody.appendChild(tr);
+
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+    const token = await user.getIdToken();
+    const res = await fetch('/api/admin-orders', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error(`admin-orders ${res.status}`);
+    const data = await res.json();
+
+    if (elOrders) elOrders.textContent = String(data.totalOrders || 0);
+    if (elRevenue) elRevenue.textContent = fmt.format(Number(data.totalRevenue || 0));
+    if (elQty) elQty.textContent = String(data.totalQty || 0);
+
+    if (tbody) {
+      tbody.innerHTML = '';
+      (data.items || []).forEach((it) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(it.name)}</td>
+          <td>${it.qty}</td>
+          <td>${fmt.format(Number(it.revenue || 0))}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  } catch (e) {
+    console.error('Load orders error', e);
   }
 }
 
