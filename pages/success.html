@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Оплата успешно завершена</title>
+  <meta name="description" content="Спасибо за оплату! Ваш заказ принят в обработку." />
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon_io/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="/public/favicon_io/favicon.ico">
+  <link rel="apple-touch-icon" href="/public/favicon_io/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/success.css" />
+</head>
+<body>
+  <main class="wrap">
+    <section class="card" role="status" aria-live="polite">
+      <div class="check" aria-hidden="true">✓</div>
+      <h1>Оплата успешно завершена</h1>
+      <p class="lead">Спасибо за покупку! Мы приняли ваш заказ и отправили подтверждение на указанную при оплате почту.</p>
+      <div id="order-info" class="order" hidden></div>
+      <div class="actions">
+        <a class="btn primary" href="/catalog">Вернуться в каталог</a>
+        <a class="btn ghost" href="/">На главную</a>
+      </div>
+      <p class="note">Если письмо не пришло в течение нескольких минут — проверьте папку «Спам».</p>
+    </section>
+  </main>
+
+  <script src="/js/success.js"></script>
+</body>
+</html>
