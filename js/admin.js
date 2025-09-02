@@ -138,7 +138,7 @@ clearBtn.addEventListener('click', () => productForm.reset());
 async function loadProducts() {
   listEl.innerHTML = '<li>Загрузка...</li>';
   try {
-    const { collection, getDocs, doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+    const { collection, getDocs, doc, deleteDoc, updateDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
     const snap = await getDocs(collection(db, 'products'));
     listEl.innerHTML = '';
 
@@ -169,10 +169,16 @@ async function loadProducts() {
 
       const meta = document.createElement('div');
       meta.style.flex = '1';
+      const currentPrice = Number(data.price || 0).toFixed(2);
       meta.innerHTML = `
         <strong>${escapeHtml(data.name)}</strong>
         <div style="color:#6b7a74;font-size:0.9rem">${escapeHtml(data.description || '')}</div>
-        <div style="font-weight:800;margin-top:6px">${data.price} €</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+          <label style="font-weight:600">Цена:</label>
+          <input type="number" step="0.01" min="0" value="${currentPrice}" style="width:110px;padding:6px 8px;border-radius:6px;border:1px solid #2a2d33;background:#0e0f12;color:#e5e7eb" data-price-id="${d.id}" />
+          <span>€</span>
+          <button class="save-price" data-id="${d.id}" style="padding:6px 10px;border-radius:8px;border:0;background:#16a34a;color:#fff;font-weight:700;cursor:pointer">Сохранить</button>
+        </div>
       `;
 
       const delBtn = document.createElement('button');
@@ -183,6 +189,29 @@ async function loadProducts() {
         await deleteDoc(doc(db, 'products', d.id));
         loadProducts();
       });
+
+      const saveBtn = li.querySelector('.save-price');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', async () => {
+          const input = li.querySelector(`input[data-price-id="${d.id}"]`);
+          const val = parseFloat(input.value);
+          if (!Number.isFinite(val) || val < 0.5) {
+            alert('Цена должна быть не меньше 0.50 €');
+            return;
+          }
+          saveBtn.disabled = true;
+          try {
+            await updateDoc(doc(db, 'products', d.id), { price: val });
+            saveBtn.textContent = 'Готово';
+            setTimeout(() => { saveBtn.textContent = 'Сохранить'; }, 2000);
+          } catch (e) {
+            console.error(e);
+            alert('Не удалось сохранить цену');
+          } finally {
+            saveBtn.disabled = false;
+          }
+        });
+      }
 
       li.appendChild(mainImg);
       li.appendChild(hoverImg);
