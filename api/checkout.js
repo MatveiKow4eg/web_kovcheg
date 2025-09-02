@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc } from "firebase/firestore/lite";
 
 // Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -32,10 +32,15 @@ export default async function handler(req, res) {
       const qty = Math.max(1, Math.min(99, Number(raw.qty || 1))); // ограничим 1..99
       if (!id) continue;
 
-      const snap = await getDoc(doc(db, "products", id));
-      if (!snap.exists()) continue;
-
-      const product = snap.data();
+      let product;
+      try {
+        const snap = await getDoc(doc(db, "products", id));
+        if (!snap.exists()) continue;
+        product = snap.data();
+      } catch (e) {
+        console.error("Firestore getDoc error for", id, e);
+        continue;
+      }
       const name = String(product.name || "Товар");
       const price = Number(product.price);
       const img = product.img ? String(product.img) : undefined;
