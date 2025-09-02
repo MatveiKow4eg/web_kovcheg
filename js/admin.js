@@ -1,7 +1,51 @@
-import { db } from './firebase.js';
+import { db, auth } from './firebase.js';
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
 import { collection, getDocs, orderBy, query, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
 const fmt = new Intl.NumberFormat('ru-EE', { style: 'currency', currency: 'EUR' });
+
+function bindAuthUI() {
+  const authSec = document.getElementById('authSection');
+  const adminSec = document.getElementById('adminSection');
+  const loginForm = document.getElementById('loginForm');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      authSec.hidden = true;
+      adminSec.hidden = false;
+      await initData();
+    } else {
+      adminSec.hidden = true;
+      authSec.hidden = false;
+    }
+  });
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = /** @type {HTMLInputElement} */(document.getElementById('email')).value.trim();
+      const password = /** @type {HTMLInputElement} */(document.getElementById('password')).value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (e) {
+        console.error('Auth error', e);
+        alert('Неверный логин или пароль');
+      }
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      await signOut(auth);
+    });
+  }
+}
+
+async function initData() {
+  await loadOrdersAgg();
+  await loadProductsEditor();
+}
 
 async function loadOrdersAgg() {
   const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
@@ -99,15 +143,6 @@ function escapeHtml(s) {
     .replaceAll("'", '&#039;');
 }
 
-(async function init() {
-  try {
-    await loadOrdersAgg();
-  } catch (e) {
-    console.error('Load orders error', e);
-  }
-  try {
-    await loadProductsEditor();
-  } catch (e) {
-    console.error('Load products error', e);
-  }
+(function init() {
+  bindAuthUI();
 })();
