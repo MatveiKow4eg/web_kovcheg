@@ -12,7 +12,7 @@
   font-size: 2.9rem;
   font-weight: 900;
   margin-bottom: 52px;
-  color: #10442e;
+  color: #ff7847;
   letter-spacing: 1.2px;
   text-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
@@ -26,34 +26,28 @@
   font-size: 1.7rem;
   margin: 0 0 32px 0;
   font-weight: 850;
-  color: #1f784a;
+  color: #103e43;
   letter-spacing: 0.7px;
 }
 
 .gallery-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 64px;
+  gap: 40px; /* расстояние между карточками */
   justify-content: center;
-  margin-bottom: 20px;
 }
 
 .gallery-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #f5f7fa;
-  border-radius: 30px;
-  box-shadow: 0 6px 32px rgba(55, 100, 85, 0.13);
-  transition: transform 0.15s, box-shadow 0.17s, background 0.18s;
-  width: 410px;
-  min-height: 420px;
-  padding: 34px 28px 24px 28px;
+  display: block;
+  width: 510px; /* можно подогнать под нужный размер */
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
   text-decoration: none;
   color: inherit;
-  position: relative;
+  transition: none;
 }
-
 .gallery-card:hover {
   box-shadow: 0 16px 54px 0 rgba(35,77,59,0.17);
   transform: translateY(-14px) scale(1.04);
@@ -65,7 +59,6 @@
   height: 235px;
   object-fit: cover;
   border-radius: 18px;
-  margin-bottom: 22px;
   background: #e8ebee;
   box-shadow: 0 4px 14px 0 rgba(70, 90, 60, 0.10);
   border: none;
@@ -180,4 +173,40 @@
 .divider {
   border-bottom: 1px dashed #e5e7eb;
   margin: 14px 0 6px 0;
+}
+
+@media (max-width: 500px) {
+  .gallery-row {
+    flex-direction: column;
+    align-items: center; /* центрируем */
+    gap: 18px;
+  }
+
+  .gallery-card {
+    width: 100%;        /* вся ширина телефона */
+    max-width: 100%;    /* без ограничения */
+    padding: 0;         /* убираем внутренние отступы */
+  }
+
+  .gallery-card img {
+    width: 100%;
+    height: auto;       /* сохраняем пропорции */
+    max-height: none;   /* убираем ограничение по высоте */
+    border-radius: 14px;
+    display: block;
+    margin: 0 auto;     /* точно по центру */
+  }
+
+  .card-caption {
+    text-align: center;
+    padding: 8px 0 0 0;
+  }
+
+  .card-caption h4 {
+    font-size: 1rem;
+  }
+
+  .card-caption p {
+    font-size: 0.9rem;
+  }
 }
