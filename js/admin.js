@@ -1,8 +1,11 @@
 import { db, auth } from './firebase.js';
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
-import { collection, getDocs, orderBy, query, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+import { collection, getDocs, orderBy, query, updateDoc, doc, addDoc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js';
 
 const fmt = new Intl.NumberFormat('ru-EE', { style: 'currency', currency: 'EUR' });
+
+let editingId = null; // текущий редактируемый товар (для admin/admin.html)
 
 function bindAuthUI() {
   const authSec = document.getElementById('authSection');
@@ -15,6 +18,7 @@ function bindAuthUI() {
       authSec.hidden = true;
       adminSec.hidden = false;
       await initData();
+      bindProductFormUI();
     } else {
       adminSec.hidden = true;
       authSec.hidden = false;
@@ -40,6 +44,89 @@ function bindAuthUI() {
       await signOut(auth);
     });
   }
+}
+
+function bindProductFormUI() {
+  const form = document.getElementById('productForm');
+  if (!form) return; // страница pages/admin.html — там другая форма (таблица)
+
+  const statusEl = document.getElementById('status');
+  const clearBtn = document.getElementById('clearBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = /** @type {HTMLInputElement} */(document.getElementById('p_name')).value.trim();
+    const description = /** @type {HTMLTextAreaElement} */(document.getElementById('p_description')).value.trim();
+    const priceVal = Number(/** @type {HTMLInputElement} */(document.getElementById('p_price')).value);
+    const overlay = /** @type {HTMLInputElement} */(document.getElementById('p_overlay')).value.trim();
+    const file = /** @type {HTMLInputElement} */(document.getElementById('p_file')).files?.[0] || null;
+    const hoverFile = /** @type {HTMLInputElement} */(document.getElementById('p_hover_file')).files?.[0] || null;
+
+    if (!name) return alert('Введите название');
+    if (!Number.isFinite(priceVal) || priceVal < 0.5) return alert('Цена должна быть не меньше 0.50 €');
+
+    try {
+      setStatus('Сохраняем...', '');
+      const data = { name, description, price: priceVal };
+      if (overlay) data.overlay = overlay;
+
+      // Загрузка файлов в Firebase Storage (если есть)
+      const storage = getStorage();
+      const uploads = [];
+      if (file) {
+        const path = `products/${Date.now()}_${sanitizeFileName(file.name)}`;
+        uploads.push(uploadAndGetURL(storage, path, file).then((url) => { data.img = url; }));
+      }
+      if (hoverFile) {
+        const path = `products/${Date.now()}_hover_${sanitizeFileName(hoverFile.name)}`;
+        uploads.push(uploadAndGetURL(storage, path, hoverFile).then((url) => { data.hoverImg = url; }));
+      }
+      if (uploads.length) await Promise.all(uploads);
+
+      if (editingId) {
+        await setDoc(doc(db, 'products', editingId), data, { merge: true });
+      } else {
+        await addDoc(collection(db, 'products'), data);
+      }
+
+      setStatus('Готово', 'success');
+      clearForm();
+      await loadProductsListUL();
+      await loadProductsEditor();
+    } catch (err) {
+      console.error('Save product error', err);
+      setStatus('Ошибка сохранения', 'error');
+    }
+  });
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      clearForm();
+      setStatus('', '');
+    });
+  }
+
+  function clearForm() {
+    editingId = null;
+    /** @type {HTMLFormElement} */(form).reset();
+  }
+
+  function setStatus(text, kind) {
+    if (!statusEl) return;
+    statusEl.textContent = text;
+    statusEl.className = `status ${kind || ''}`;
+  }
+}
+
+async function uploadAndGetURL(storage, path, file) {
+  const r = storageRef(storage, path);
+  await uploadBytes(r, file, { contentType: file.type });
+  return await getDownloadURL(r);
+}
+
+function sanitizeFileName(name) {
+  return name.replace(/[^a-zA-Z0-9_.-]/g, '_');
 }
 
 async function initData() {
@@ -150,8 +237,30 @@ async function loadProductsListUL() {
   snap.forEach(d => {
     const p = d.data();
     const li = document.createElement('li');
+    li.dataset.id = d.id;
     const price = Number(p.price || 0);
     li.textContent = `${p.name || d.id} — ${price.toFixed(2)} €`;
+    li.style.cursor = 'pointer';
+    li.title = 'Нажмите, чтобы отредактировать';
+    li.addEventListener('click', async () => {
+      // Заполнить форму данными товара для редактирования
+      try {
+        const snap = await getDoc(doc(db, 'products', d.id));
+        if (!snap.exists()) return;
+        const prod = snap.data();
+        editingId = d.id;
+        const fName = /** @type {HTMLInputElement} */(document.getElementById('p_name'));
+        const fDesc = /** @type {HTMLTextAreaElement} */(document.getElementById('p_description'));
+        const fPrice = /** @type {HTMLInputElement} */(document.getElementById('p_price'));
+        const fOverlay = /** @type {HTMLInputElement} */(document.getElementById('p_overlay'));
+        if (fName) fName.value = prod.name || '';
+        if (fDesc) fDesc.value = prod.description || '';
+        if (fPrice) fPrice.value = Number(prod.price || 0).toFixed(2);
+        if (fOverlay) fOverlay.value = prod.overlay || '';
+      } catch (e) {
+        console.error('Prefill product error', e);
+      }
+    });
     list.appendChild(li);
   });
 }
