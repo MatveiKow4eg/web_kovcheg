@@ -95,6 +95,8 @@ productForm.addEventListener('submit', async e => {
     const description = document.getElementById('p_description').value.trim();
     const price = parseFloat(document.getElementById('p_price').value) || 0;
     const overlay = document.getElementById('p_overlay').value.trim() || null;
+    const weightVal = document.getElementById('p_weight') ? document.getElementById('p_weight').value : '';
+    const weight = weightVal === '' ? null : Math.max(0, parseFloat(weightVal));
     const mainFile = document.getElementById('p_file').files[0];
     const hoverFile = document.getElementById('p_hover_file').files[0];
 
@@ -116,6 +118,7 @@ productForm.addEventListener('submit', async e => {
       name,
       description,
       price,
+      weight: Number.isFinite(weight) ? weight : null,
       overlay,
       img: imgUrl || '',
       hoverImg: hoverImgUrl || '',
@@ -170,14 +173,19 @@ async function loadProducts() {
       const meta = document.createElement('div');
       meta.style.flex = '1';
       const currentPrice = Number(data.price || 0).toFixed(2);
+      const currentWeight = data.weight ?? '';
       meta.innerHTML = `
         <strong>${escapeHtml(data.name)}</strong>
         <div style="color:#6b7a74;font-size:0.9rem">${escapeHtml(data.description || '')}</div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
           <label style="font-weight:600">Цена:</label>
           <input type="number" step="0.01" min="0" value="${currentPrice}" style="width:110px;padding:6px 8px;border-radius:6px;border:1px solid #2a2d33;background:#0e0f12;color:#e5e7eb" data-price-id="${d.id}" />
           <span>€</span>
           <button class="save-price" data-id="${d.id}" style="padding:6px 10px;border-radius:8px;border:0;background:#16a34a;color:#fff;font-weight:700;cursor:pointer">Сохранить</button>
+          <span style="width:16px"></span>
+          <label style="font-weight:600">Вес (кг):</label>
+          <input type="number" step="0.01" min="0" value="${currentWeight}" placeholder="0.00" style="width:110px;padding:6px 8px;border-radius:6px;border:1px solid #2a2d33;background:#0e0f12;color:#e5e7eb" data-weight-id="${d.id}" />
+          <button class="save-weight" data-id="${d.id}" style="padding:6px 10px;border-radius:8px;border:0;background:#0ea5e9;color:#fff;font-weight:700;cursor:pointer">Сохранить вес</button>
         </div>
       `;
 
@@ -197,7 +205,7 @@ async function loadProducts() {
       li.appendChild(delBtn);
       listEl.appendChild(li);
 
-      // Теперь найдём кнопку и привяжем обработчик
+      // Теперь найдём кнопки и привяжем обработчики
       const saveBtn = li.querySelector('.save-price');
       if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
@@ -217,6 +225,30 @@ async function loadProducts() {
             alert('Не удалось сохранить цену');
           } finally {
             saveBtn.disabled = false;
+          }
+        });
+      }
+
+      const saveW = li.querySelector('.save-weight');
+      if (saveW) {
+        saveW.addEventListener('click', async () => {
+          const input = li.querySelector(`input[data-weight-id="${d.id}"]`);
+          let val = input.value.trim();
+          if (val === '') val = null; else val = Math.max(0, parseFloat(val));
+          if (val !== null && !Number.isFinite(val)) {
+            alert('Некорректный вес');
+            return;
+          }
+          saveW.disabled = true;
+          try {
+            await updateDoc(doc(db, 'products', d.id), { weight: val });
+            saveW.textContent = 'Готово';
+            setTimeout(() => { saveW.textContent = 'Сохранить вес'; }, 2000);
+          } catch (e) {
+            console.error(e);
+            alert('Не удалось сохранить вес');
+          } finally {
+            saveW.disabled = false;
           }
         });
       }
