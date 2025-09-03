@@ -58,9 +58,26 @@ async function geocodeAddress(address) {
   const parts = String(address).split(',').map(p => p.trim()).filter(Boolean);
   const zipMatch = String(address).match(/\b\d{5}\b/);
   const zip = zipMatch ? zipMatch[0] : '';
-  const street = parts[0] || '';
+  let street = parts[0] || '';
   // Find potential city: prefer a part that isn't Estonia/maakond and has letters
   let city = parts.find(p => !/estonia/i.test(p) && !/maakond/i.test(p) && /[A-Za-zÄÖÜÕäöüõ]/.test(p) && !/\d{5}/.test(p)) || '';
+
+  // Heuristic: when no commas and format like "Aniisi 11 Saue 76505"
+  if (!city && zip && street && parts.length === 1) {
+    const cleaned = repl(stripMaakond(street));
+    const noZip = cleaned.replace(new RegExp(`\\b${zip}\\b`), '').trim();
+    const tokens = noZip.split(/\s+/);
+    for (let i = tokens.length - 1; i >= 0; i--) {
+      const t = tokens[i];
+      if (/[A-Za-zÄÖÜÕäöüõ\-]/.test(t) && !/\d/.test(t)) {
+        city = t;
+        const idx = noZip.lastIndexOf(city);
+        const streetGuess = noZip.slice(0, idx).trim();
+        if (streetGuess) { street = streetGuess; warnings.push('address_zip_city_heuristic'); }
+        break;
+      }
+    }
+  }
 
   // Build candidate queries (free text and structured)
   const candidates = [];
