@@ -1,18 +1,16 @@
 import Stripe from "stripe";
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { initializeApp as initAdminApp, cert, getApps } from "firebase-admin/app";
+import { getFirestore as getAdminFirestore, FieldValue } from "firebase-admin/firestore";
 
 // Stripe init
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Firebase init (server-side via env)
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Firebase Admin init
+const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || "{}");
+if (!getApps().length) {
+  initAdminApp({ credential: cert(sa), projectId: sa.project_id || process.env.FIREBASE_PROJECT_ID });
+}
+const db = getAdminFirestore();
 
 export const config = { api: { bodyParser: false } };
 
@@ -72,16 +70,16 @@ export default async function handler(req, res) {
         total_weight_kg: md.shipping_weight_kg ? Number(md.shipping_weight_kg) : null,
       };
 
-      // Сохраняем заказ в Firestore
+      // Сохраняем заказ в Firestore (admin SDK)
       try {
-        const orderRef = doc(db, "orders", session.id);
-        await setDoc(orderRef, {
+        const orderRef = db.collection("orders").doc(session.id);
+        await orderRef.set({
           id: session.id,
           email,
           items,
           total,
           currency,
-          createdAt: new Date().toISOString(),
+          createdAt: FieldValue.serverTimestamp(),
           status: "paid",
           shipping,
         });
