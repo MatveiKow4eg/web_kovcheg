@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       const session = event.data.object; // Stripe.Checkout.Session
 
       // Получаем email покупателя и валюту/сумму
-      const email = session?.customer_details?.email || null;
+      const email = session?.customer_details?.email || session?.customer_email || null;
       const currency = (session?.currency || "eur").toLowerCase();
       const total = Number(session?.amount_total || 0) / 100;
 
@@ -95,6 +95,9 @@ export default async function handler(req, res) {
         const FROM = process.env.ZOHO_FROM; // отправитель (адрес)
         const FROM_NAME = process.env.FROM_NAME || "Kovcheg";
         const ADMINS = String(process.env.ADMIN_EMAILS || "").split(/[,;\s]+/).filter(Boolean);
+        const ZEPTO_BASE_URL = process.env.ZEPTO_BASE_URL; // e.g., https://api.zeptomail.eu
+        const TPL_CUSTOMER = process.env.ZEPTO_TEMPLATE_CUSTOMER_PAID;
+        const TPL_ADMIN = process.env.ZEPTO_TEMPLATE_ADMIN_ORDER;
 
         if (!API_KEY || !FROM) {
           console.warn("Email not sent: ZOHO_API_KEY or ZOHO_FROM not configured");
@@ -110,6 +113,27 @@ export default async function handler(req, res) {
               (Number.isFinite(shipping.total_weight_kg) ? `Вес: ${shipping.total_weight_kg} кг` : "") +
               `</p>`
             : `<p>Доставка: не указана (возможно самовывоз)</p>`;
+
+          const itemsText = items.length
+            ? items.map(i => `${i.name} × ${i.quantity} — ${formatCurrency(i.amount_total, i.currency)}`).join("\n")
+            : "—";
+
+          const mergeInfo = {
+            order_id: session.id,
+            order_total: formatCurrency(total, currency),
+            order_total_value: total,
+            currency: String(currency).toUpperCase(),
+            customer_email: email || "",
+            shipping_method: shipping.method || "",
+            shipping_option: shipping.option || "",
+            shipping_address: shipping.address || "",
+            shipping_price: formatCurrency(shipping.price_eur, currency),
+            shipping_distance_km: shipping.distance_km ?? "",
+            shipping_weight_kg: shipping.total_weight_kg ?? "",
+            items_html: itemsHtml,
+            items_text: itemsText,
+            created_at: new Date().toISOString(),
+          };
 
           // Письмо клиенту
           if (email) {
@@ -128,6 +152,9 @@ export default async function handler(req, res) {
                 ${itemsHtml}
                 <p>Мы скоро с вами свяжемся.</p>
               `,
+              templateKey: TPL_CUSTOMER,
+              mergeInfo,
+              baseUrl: ZEPTO_BASE_URL,
             });
           }
 
@@ -149,6 +176,9 @@ export default async function handler(req, res) {
                   <h3>Позиции</h3>
                   ${itemsHtml}
                 `,
+                templateKey: TPL_ADMIN,
+                mergeInfo,
+                baseUrl: ZEPTO_BASE_URL,
               });
             }
           }
@@ -191,22 +221,30 @@ function formatCurrency(amount, currency = "eur") {
   }
 }
 
-async function sendZeptoMail({ apiKey, to, from, fromName, subject, html }) {
-  const resp = await fetch("https://api.zeptomail.com/v1.1/email", {
+async function sendZeptoMail({ apiKey, to, from, fromName, subject, html, templateKey, mergeInfo, baseUrl }) {
+  const root = (baseUrl || process.env.ZEPTO_BASE_URL || "https://api.zeptomail.eu").replace(/\/+$/, "");
+  const url = templateKey ? `${root}/v1.1/email/template` : `${root}/v1.1/email`;
+  const payload = {
+    from: { address: from, name: fromName },
+    to: [{ email_address: { address: to } }],
+  };
+  if (templateKey) {
+    payload.template_key = templateKey;
+    if (mergeInfo && typeof mergeInfo === "object") payload.merge_info = mergeInfo;
+  } else {
+    payload.subject = subject || "";
+    payload.htmlbody = html || "";
+  }
+  const resp = await fetch(url, {
     method: "POST",
     headers: {
-      "Authorization": `Zoho-enczapikey ${apiKey}`,
+      Authorization: `Zoho-enczapikey ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      from: { address: from, name: fromName },
-      to: [{ email_address: { address: to } }],
-      subject,
-      htmlbody: html,
-    }),
+    body: JSON.stringify(payload),
   });
   if (!resp.ok) {
-    const text = await resp.text();
+    const text = await resp.text().catch(() => "");
     throw new Error(`ZeptoMail error: ${resp.status} ${resp.statusText} - ${text}`);
   }
 }
