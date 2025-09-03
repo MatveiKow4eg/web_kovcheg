@@ -6,6 +6,7 @@
     { "src": "^/$", "dest": "/pages/index.html" },
     { "src": "^/products/([0-9]+)$", "dest": "/pages/products.html?id=$1" },
     { "src": "^/theme$", "status": 308, "headers": { "Location": "/pages/theme.html" } },
+    { "src": "^/cart$", "status": 308, "headers": { "Location": "/checkout" } },
 
     { "src": "^/([a-zA-Z0-9_-]+)\\.html$", "dest": "/pages/$1.html" },
     { "src": "^/([a-zA-Z0-9_-]+)$", "dest": "/pages/$1.html" }

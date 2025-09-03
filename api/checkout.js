@@ -154,7 +154,7 @@ export default async function handler(req, res) {
       mode: "payment",
       line_items: lineItems,
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/cart?canceled=1`,
+      cancel_url: `${origin}/checkout?canceled=1`,
       metadata: {
         item_ids: items.map((i) => i.id).join(","),
         ...shippingMeta,

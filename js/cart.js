@@ -152,7 +152,7 @@ function createCartWidget() {
   });
 
   document.getElementById('go-to-cart').addEventListener('click', () => {
-    window.location.href = 'cart.html';
+    window.location.href = '/checkout';
   });
 
   document.getElementById('continue-shopping').addEventListener('click', () => {
