@@ -45,15 +45,52 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 }
 
 async function geocodeAddress(address) {
+  const warnings = [];
+  const ensureEstonia = (s) => (/estonia/i.test(s) ? s : `${s}, Estonia`);
+  const repl = (s) => s
+    .replace(/\btn\.?\b/gi, " tänav ")
+    .replace(/\bmnt\.?\b/gi, " maantee ")
+    .replace(/\bpst\.?\b/gi, " puiestee ")
+    .replace(/\s+/g, " ").trim();
+  const stripMaakond = (s) => s.replace(/,?\s*[A-Za-zÄÖÜÕäöüõ\- ]+\s+maakond/gi, "");
+
+  // Parse components heuristically
+  const parts = String(address).split(',').map(p => p.trim()).filter(Boolean);
+  const zipMatch = String(address).match(/\b\d{5}\b/);
+  const zip = zipMatch ? zipMatch[0] : '';
+  const street = parts[0] || '';
+  // Find potential city: prefer a part that isn't Estonia/maakond and has letters
+  let city = parts.find(p => !/estonia/i.test(p) && !/maakond/i.test(p) && /[A-Za-zÄÖÜÕäöüõ]/.test(p) && !/\d{5}/.test(p)) || '';
+
+  // Build candidate queries (free text and structured)
+  const candidates = [];
+  const original = ensureEstonia(address);
+  const normalized = ensureEstonia(stripMaakond(repl(address)));
+  candidates.push({ type: 'q', q: original });
+  if (normalized.toLowerCase() !== original.toLowerCase()) candidates.push({ type: 'q', q: normalized });
+
+  // Reorder "ZIP City" if both present
+  if (zip && city) {
+    const streetClean = street ? repl(stripMaakond(street)) : '';
+    candidates.push({ type: 'q', q: ensureEstonia(`${streetClean}, ${zip} ${city}`) });
+  }
+
+  // Structured
+  const streetStruct = street ? repl(stripMaakond(street)) : '';
+  const cityStruct = city ? repl(stripMaakond(city)) : '';
+  if (streetStruct || cityStruct || zip) {
+    candidates.push({ type: 'struct', street: streetStruct, city: cityStruct, postalcode: zip });
+  }
+
+  // Try cache by original normalized key first
   const normalizedId = normalizeAddressId(address);
   const cacheRef = doc(db, "geocache", normalizedId);
-
   try {
     const snap = await getDoc(cacheRef);
     if (snap.exists()) {
       const data = snap.data();
       if (data?.lat && data?.lon) {
-        return { lat: Number(data.lat), lon: Number(data.lon), provider: data.provider || GEOCODER_PROVIDER, cached: true };
+        return { lat: Number(data.lat), lon: Number(data.lon), provider: data.provider || GEOCODER_PROVIDER, cached: true, warnings };
       }
     }
   } catch (e) {
@@ -64,30 +101,53 @@ async function geocodeAddress(address) {
     throw Object.assign(new Error("Unsupported geocoder provider in this prototype"), { status: 501, code: "geocoder_not_implemented" });
   }
 
-  // Nominatim search restricted to Estonia (country code: ee)
-  const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=ee&limit=1&q=${encodeURIComponent(address)}`;
   const ua = process.env.GEOCODER_UA || `web-kovcheg/1.0 (${process.env.ADMIN_EMAILS || "no-admin"})`;
+  const doSearch = async (cand) => {
+    let url;
+    if (cand.type === 'q') {
+      url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=ee&limit=1&q=${encodeURIComponent(cand.q)}`;
+    } else {
+      const sp = new URLSearchParams({ format: 'json', addressdetails: '1', country: 'Estonia', limit: '1' });
+      if (cand.street) sp.append('street', cand.street);
+      if (cand.city) sp.append('city', cand.city);
+      if (cand.postalcode) sp.append('postalcode', cand.postalcode);
+      url = `https://nominatim.openstreetmap.org/search?${sp.toString()}`;
+    }
+    const resp = await fetch(url, { headers: { 'User-Agent': ua, 'Accept': 'application/json' } });
+    if (resp.status === 429) {
+      const e = new Error('Rate limited by geocoder'); e.status = 429; e.code = 'geocode_rate_limited'; throw e;
+    }
+    if (!resp.ok) {
+      const text = await resp.text().catch(()=>"");
+      const e = new Error(`Geocoder failed ${resp.status}: ${text}`); e.status = 502; e.code = 'geocode_failed'; throw e;
+    }
+    const arr = await resp.json();
+    return Array.isArray(arr) && arr.length ? arr[0] : null;
+  };
 
-  const resp = await fetch(url, {
-    headers: {
-      "User-Agent": ua,
-      "Accept": "application/json",
-    },
-  });
-
-  if (resp.status === 429) {
-    throw Object.assign(new Error("Rate limited by geocoder"), { status: 429, code: "geocode_rate_limited" });
+  let best = null;
+  for (let i = 0; i < candidates.length; i++) {
+    best = await doSearch(candidates[i]);
+    if (best) {
+      if (i > 0) warnings.push('address_fallback_used');
+      break;
+    }
   }
-  if (!resp.ok) {
-    const text = await resp.text().catch(() => "");
-    throw Object.assign(new Error(`Geocoder failed ${resp.status}: ${text}`), { status: 502, code: "geocode_failed" });
+
+  // Fallbacks: try postalcode alone, then city alone
+  if (!best && zip) {
+    best = await doSearch({ type: 'q', q: ensureEstonia(zip) });
+    if (best) warnings.push('address_postal_fallback');
+  }
+  if (!best && city) {
+    best = await doSearch({ type: 'q', q: ensureEstonia(city) });
+    if (best) warnings.push('address_city_fallback');
   }
 
-  const arr = await resp.json();
-  if (!Array.isArray(arr) || arr.length === 0) {
+  if (!best) {
     throw Object.assign(new Error("Address not found"), { status: 422, code: "address_not_found" });
   }
-  const best = arr[0];
+
   const lat = parseFloat(best.lat);
   const lon = parseFloat(best.lon);
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
@@ -107,7 +167,7 @@ async function geocodeAddress(address) {
     console.warn("geocache write error:", e);
   }
 
-  return { lat, lon, provider: GEOCODER_PROVIDER, cached: false };
+  return { lat, lon, provider: GEOCODER_PROVIDER, cached: false, warnings };
 }
 
 async function loadShippingConfig() {
@@ -221,7 +281,8 @@ export default async function handler(req, res) {
     const distanceKm = haversineKm(WAREHOUSE_LAT, WAREHOUSE_LON, geo.lat, geo.lon);
 
     // Weight
-    const { totalWeightKg, warnings } = await resolveItemsWeight(items);
+    const { totalWeightKg, warnings: weightWarnings } = await resolveItemsWeight(items);
+    const warnings = [...(geo.warnings || []), ...weightWarnings];
 
     // Base formula
     let basePrice = cfg.base_eur + cfg.per_km_eur * distanceKm + cfg.per_kg_eur * totalWeightKg;

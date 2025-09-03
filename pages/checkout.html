@@ -42,6 +42,8 @@
     .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
     .options { margin-top: 10px; }
+    .suggest-item { padding:10px 12px; cursor:pointer; }
+    .suggest-item:hover { background:#f7f7f7; }
     .option { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; margin: 8px 0; }
     .option input { margin: 0; }
     .option .price { margin-left: auto; font-weight: 700; }
@@ -81,9 +83,10 @@
       <!-- Right: Address and Shipping -->
       <div class="card">
         <h2 class="section-title">Доставка</h2>
-        <div class="field">
+        <div class="field" style="position:relative">
           <label class="label">Улица и дом</label>
           <input class="input" id="street" placeholder="Tartu mnt 10" autocomplete="address-line1">
+          <div id="streetSuggest" class="suggest" style="display:none; position:absolute; left:0; right:0; top:72px; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.08); z-index: 20; max-height: 260px; overflow:auto"></div>
         </div>
         <div class="row">
           <div class="field">
@@ -131,6 +134,7 @@
   const sumShippingEl = el('sumShipping');
   const sumTotalEl = el('sumTotal');
   const payBtn = el('payBtn');
+  const suggestBox = el('streetSuggest');
 
   function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]'); }
   function saveCart(c){ localStorage.setItem('cart', JSON.stringify(c)); }
@@ -337,9 +341,10 @@
   const triggerQuote = debounce(requestQuote, 500);
 
   // Address listeners
-  ['street','city','zip'].forEach(id => {
-    el(id).addEventListener('input', triggerQuote);
-  });
+  // Suggest + quote
+  const suggestDebounced = debounce(requestSuggest, 400);
+  el('street').addEventListener('input', () => { suggestDebounced(); triggerQuote(); });
+  ['city','zip'].forEach(id => { el(id).addEventListener('input', triggerQuote); });
 
   // Back
   el('backToCart').addEventListener('click', ()=>{ window.location.href = '/cart'; });
@@ -400,6 +405,40 @@
       payBtn.textContent = 'Оплатить';
     }
   });
+
+  // Suggest fetcher
+  async function requestSuggest(){
+    const q = el('street').value.trim();
+    if (q.length < 2){ suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
+    try {
+      const resp = await fetch(`/api/address-suggest?q=${encodeURIComponent(q)}&limit=6`, { headers: { Accept: 'application/json' } });
+      if (!resp.ok){ suggestBox.style.display = 'none'; return; }
+      const data = await resp.json();
+      const list = Array.isArray(data.suggestions) ? data.suggestions : [];
+      if (!list.length){ suggestBox.style.display = 'none'; suggestBox.innerHTML = ''; return; }
+      suggestBox.innerHTML = '';
+      list.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'suggest-item';
+        div.textContent = s.label;
+        div.addEventListener('click', () => {
+          if (s.components){
+            if (s.components.street) el('street').value = s.components.street;
+            if (s.components.city) el('city').value = s.components.city;
+            if (s.components.zip) el('zip').value = s.components.zip;
+          } else {
+            el('street').value = s.label;
+          }
+          suggestBox.style.display = 'none';
+          triggerQuote();
+        });
+        suggestBox.appendChild(div);
+      });
+      suggestBox.style.display = 'block';
+    } catch(e){
+      suggestBox.style.display = 'none';
+    }
+  }
 
   // Init
   renderItems();
