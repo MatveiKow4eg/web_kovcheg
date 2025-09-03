@@ -83,19 +83,24 @@
       <!-- Right: Address and Shipping -->
       <div class="card">
         <h2 class="section-title">Доставка</h2>
+        <div class="field">
+          <label class="label">Email</label>
+          <input class="input" id="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+          <div class="hint">На этот адрес придёт подтверждение заказа</div>
+        </div>
         <div class="field" style="position:relative">
           <label class="label">Улица и дом</label>
-          <input class="input" id="street" placeholder="Tartu mnt 10" autocomplete="address-line1">
+          <input class="input" id="street" placeholder="Tartu mnt 10" autocomplete="address-line1" required>
           <div id="streetSuggest" class="suggest" style="display:none; position:absolute; left:0; right:0; top:72px; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 20px rgba(0,0,0,0.08); z-index: 20; max-height: 260px; overflow:auto"></div>
         </div>
         <div class="row">
           <div class="field">
             <label class="label">Город</label>
-            <input class="input" id="city" placeholder="Tallinn" autocomplete="address-level2">
+            <input class="input" id="city" placeholder="Tallinn" autocomplete="address-level2" required>
           </div>
           <div class="field">
             <label class="label">Индекс</label>
-            <input class="input" id="zip" placeholder="10145" autocomplete="postal-code">
+            <input class="input" id="zip" placeholder="10145" autocomplete="postal-code" required>
           </div>
         </div>
         <div class="field">
@@ -135,6 +140,7 @@
   const sumTotalEl = el('sumTotal');
   const payBtn = el('payBtn');
   const suggestBox = el('streetSuggest');
+  const emailEl = el('email');
 
   function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]'); }
   function saveCart(c){ localStorage.setItem('cart', JSON.stringify(c)); }
@@ -218,6 +224,19 @@
 
   function escapeHtml(s){
     return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+  }
+
+  function isValidEmail(v){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(v||'').trim()); }
+  function updatePayState(){
+    const cart = getCart();
+    const street = el('street').value.trim();
+    const city = el('city').value.trim();
+    const zip = el('zip').value.trim();
+    const email = emailEl ? emailEl.value.trim() : '';
+    const hasAddr = street && city && zip;
+    const hasQuote = !!lastQuote && !!selectedOptionId;
+    const emailOk = isValidEmail(email);
+    payBtn.disabled = !(cart.length>0 && hasAddr && hasQuote && emailOk && !quoteInFlight);
   }
 
   // Debounce helper
@@ -322,12 +341,14 @@
         const o = opts.find(x=>x.id===selectedOptionId);
         currentShippingPrice = o ? Number(o.price_eur||0) : null;
         updateSummary(o);
+        updatePayState();
       });
     });
 
     const selected = opts.find(x=>x.id===selectedOptionId);
     currentShippingPrice = selected ? Number(selected.price_eur||0) : null;
     updateSummary(selected);
+    updatePayState();
 
     // Warnings (e.g., missing weights)
     if (Array.isArray(quote.warnings) && quote.warnings.length){
@@ -343,8 +364,9 @@
   // Address listeners
   // Suggest + quote
   const suggestDebounced = debounce(requestSuggest, 400);
-  el('street').addEventListener('input', () => { suggestDebounced(); triggerQuote(); });
-  ['city','zip'].forEach(id => { el(id).addEventListener('input', triggerQuote); });
+  el('street').addEventListener('input', () => { suggestDebounced(); triggerQuote(); updatePayState(); });
+  ['city','zip'].forEach(id => { el(id).addEventListener('input', () => { triggerQuote(); updatePayState(); }); });
+  const emailInput = document.getElementById('email'); if (emailInput) { emailInput.addEventListener('input', updatePayState); }
 
   // Back
   el('backToCart').addEventListener('click', ()=>{ window.location.href = '/cart'; });
@@ -368,10 +390,13 @@
     payBtn.textContent = 'Создание платежа…';
 
     try {
+      const email = emailEl.value.trim();
+      if (!isValidEmail(email)) { throw new Error('Введите корректный email'); }
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify({
+          email: email,
           items: cart.map(i=>({ id:i.id, qty:i.qty })),
           shipping: {
             optionId: selected.id,
