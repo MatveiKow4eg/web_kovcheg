@@ -59,6 +59,19 @@ export default async function handler(req, res) {
         console.error("Failed to list line items:", e);
       }
 
+      // Извлекаем shipping информацию из metadata
+      const md = session?.metadata || {};
+      const shipping = {
+        method: md.shipping_method || null,
+        option: md.shipping_option_label || null,
+        address: md.shipping_address || null,
+        lat: md.shipping_lat ? Number(md.shipping_lat) : null,
+        lon: md.shipping_lon ? Number(md.shipping_lon) : null,
+        price_eur: md.shipping_price_cents ? Number(md.shipping_price_cents) / 100 : 0,
+        distance_km: md.shipping_distance_km ? Number(md.shipping_distance_km) : null,
+        total_weight_kg: md.shipping_weight_kg ? Number(md.shipping_weight_kg) : null,
+      };
+
       // Сохраняем заказ в Firestore
       try {
         const orderRef = doc(db, "orders", session.id);
@@ -70,6 +83,7 @@ export default async function handler(req, res) {
           currency,
           createdAt: new Date().toISOString(),
           status: "paid",
+          shipping,
         });
       } catch (e) {
         console.error("Firestore write error:", e);
@@ -80,7 +94,7 @@ export default async function handler(req, res) {
         const API_KEY = process.env.ZOHO_API_KEY;
         const FROM = process.env.ZOHO_FROM; // отправитель (адрес)
         const FROM_NAME = process.env.FROM_NAME || "Kovcheg";
-        const ADMIN = process.env.ADMIN_EMAIL;
+        const ADMINS = String(process.env.ADMIN_EMAILS || "").split(/[,;\s]+/).filter(Boolean);
 
         if (!API_KEY || !FROM) {
           console.warn("Email not sent: ZOHO_API_KEY or ZOHO_FROM not configured");
@@ -88,6 +102,14 @@ export default async function handler(req, res) {
           const itemsHtml = items.length
             ? `<ul>` + items.map(i => `<li>${escapeHtml(i.name)} × ${i.quantity} — ${formatCurrency(i.amount_total, i.currency)}</li>`).join("") + `</ul>`
             : `<p>Состав заказа недоступен.</p>`;
+
+          const shippingHtml = shipping?.method
+            ? `<p><b>Доставка:</b> ${escapeHtml(shipping.option || shipping.method)} — ${formatCurrency(shipping.price_eur, currency)}<br>` +
+              (shipping.address ? `Адрес: ${escapeHtml(shipping.address)}<br>` : "") +
+              (Number.isFinite(shipping.distance_km) ? `Расстояние: ${shipping.distance_km} км<br>` : "") +
+              (Number.isFinite(shipping.total_weight_kg) ? `Вес: ${shipping.total_weight_kg} кг` : "") +
+              `</p>`
+            : `<p>Доставка: не указана (возможно самовывоз)</p>`;
 
           // Письмо клиенту
           if (email) {
@@ -101,6 +123,7 @@ export default async function handler(req, res) {
                 <h2>Спасибо за заказ!</h2>
                 <p>Сумма: <b>${formatCurrency(total, currency)}</b></p>
                 <p>Номер заказа: <b>${session.id}</b></p>
+                ${shippingHtml}
                 <h3>Состав заказа</h3>
                 ${itemsHtml}
                 <p>Мы скоро с вами свяжемся.</p>
@@ -108,23 +131,26 @@ export default async function handler(req, res) {
             });
           }
 
-          // Письмо админу
-          if (ADMIN) {
-            await sendZeptoMail({
-              apiKey: API_KEY,
-              to: ADMIN,
-              from: FROM,
-              fromName: FROM_NAME,
-              subject: `Новый заказ на ${formatCurrency(total, currency)}`,
-              html: `
-                <h2>Новый заказ</h2>
-                <p><b>Клиент:</b> ${email ? escapeHtml(email) : "не указан"}</p>
-                <p><b>Сумма:</b> ${formatCurrency(total, currency)}</p>
-                <p><b>ID заказа:</b> ${session.id}</p>
-                <h3>Позиции</h3>
-                ${itemsHtml}
-              `,
-            });
+          // Письмо админам (всем администраторам)
+          if (ADMINS.length > 0) {
+            for (const admin of ADMINS) {
+              await sendZeptoMail({
+                apiKey: API_KEY,
+                to: admin,
+                from: FROM,
+                fromName: FROM_NAME,
+                subject: `Новый заказ на ${formatCurrency(total, currency)}`,
+                html: `
+                  <h2>Новый заказ</h2>
+                  <p><b>Клиент:</b> ${email ? escapeHtml(email) : "не указан"}</p>
+                  <p><b>Сумма:</b> ${formatCurrency(total, currency)}</p>
+                  <p><b>ID заказа:</b> ${session.id}</p>
+                  ${shippingHtml}
+                  <h3>Позиции</h3>
+                  ${itemsHtml}
+                `,
+              });
+            }
           }
         }
       } catch (e) {
@@ -161,7 +187,7 @@ function formatCurrency(amount, currency = "eur") {
   try {
     return new Intl.NumberFormat("ru-EE", { style: "currency", currency: currency.toUpperCase() }).format(amount);
   } catch {
-    return `${amount.toFixed(2)} ${currency.toUpperCase()}`;
+    return `${Number(amount).toFixed(2)} ${currency.toUpperCase()}`;
   }
 }
 
