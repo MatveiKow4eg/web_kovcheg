@@ -67,7 +67,7 @@
   <div class="cart-summary" id="cart-total">Итого: 0 €</div>
   <div class="cart-actions">
     <button class="continue-btn" id="continue-shopping">Продолжить покупки</button>
-    <button class="checkout-btn" id="checkout-btn">Оплатить</button>
+    <button class="checkout-btn" id="checkout-btn">Оформить заказ</button>
   </div>
 </div>
 
@@ -140,28 +140,11 @@
     window.location.href = '/catalog';
   });
 
-  // Оплата
-  document.getElementById('checkout-btn').addEventListener('click', async () => {
+  // Оформление заказа
+  document.getElementById('checkout-btn').addEventListener('click', () => {
     const cart = getCart();
-    if(cart.length === 0) return alert("Корзина пуста");
-
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ items: cart })
-      });
-
-      if(!res.ok) throw new Error("Ошибка при создании сессии");
-
-      const data = await res.json();
-      if(data.url) {
-        window.location.href = data.url;
-      }
-    } catch(err) {
-      console.error(err);
-      alert("Произошла ошибка при оплате");
-    }
+    if (cart.length === 0) return alert("Корзина пуста");
+    window.location.href = '/checkout';
   });
 
   // инициализация
