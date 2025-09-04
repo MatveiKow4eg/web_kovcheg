@@ -80,10 +80,17 @@ async function _loadShippingConfig(db){
       express_multiplier: _toNumber(data.express_multiplier, 1.5),
       pickup_enabled: data.pickup_enabled !== false,
       currency: (data.currency || "eur").toLowerCase(),
+      weight_tiers: Array.isArray(data.weight_tiers)
+        ? data.weight_tiers
+            .map((t) => ({ max_kg: _toNumber(t.max_kg), price_eur: _toNumber(t.price_eur) }))
+            .filter((t) => Number.isFinite(t.max_kg) && t.max_kg > 0 && Number.isFinite(t.price_eur) && t.price_eur >= 0)
+            .sort((a, b) => a.max_kg - b.max_kg)
+        : [],
+      weight_overflow_per_kg_eur: _toNumber(data.weight_overflow_per_kg_eur, 0),
     };
   } catch(e){
     console.warn("shipping_config read error:", e);
-    return { base_eur:2, per_km_eur:0.5, per_kg_eur:0.5, min_price_eur:3, free_over_eur:0, remote_zone_km:60, remote_surcharge_eur:5, express_multiplier:1.5, pickup_enabled:true, currency:"eur" };
+    return { base_eur:2, per_km_eur:0.0, per_kg_eur:0.0, min_price_eur:0, free_over_eur:0, remote_zone_km:0, remote_surcharge_eur:0, express_multiplier:1.5, pickup_enabled:true, currency:"eur", weight_tiers:[{max_kg:2,price_eur:3.5},{max_kg:5,price_eur:4.5}], weight_overflow_per_kg_eur:0 };
   }
 }
 async function _resolveItemsWeight(db, items){
@@ -109,10 +116,34 @@ async function calcServerShippingQuote({ address, subtotal, items }){
   const geo = await _geocodeAddress(db, address);
   const distanceKm = _haversineKm(WAREHOUSE_LAT, WAREHOUSE_LON, geo.lat, geo.lon);
   const { totalWeightKg, warnings } = await _resolveItemsWeight(db, items);
-  let basePrice = cfg.base_eur + cfg.per_km_eur * distanceKm + cfg.per_kg_eur * totalWeightKg;
-  if (cfg.remote_zone_km > 0 && distanceKm > cfg.remote_zone_km) basePrice += cfg.remote_surcharge_eur;
-  basePrice = Math.max(basePrice, cfg.min_price_eur);
-  const standardPrice = subtotal >= cfg.free_over_eur ? 0 : basePrice;
+  let basePrice;
+  let standardBase;
+  if (Array.isArray(cfg.weight_tiers) && cfg.weight_tiers.length > 0) {
+    const tiers = cfg.weight_tiers;
+    let tierPrice = null;
+    for (const t of tiers) {
+      if (totalWeightKg <= t.max_kg + 1e-9) { tierPrice = t.price_eur; break; }
+    }
+    if (tierPrice === null) {
+      if (_toNumber(cfg.weight_overflow_per_kg_eur, 0) > 0) {
+        const last = tiers[tiers.length - 1];
+        const extraKg = Math.max(0, totalWeightKg - last.max_kg);
+        tierPrice = last.price_eur + _toNumber(cfg.weight_overflow_per_kg_eur, 0) * extraKg;
+      } else {
+        tierPrice = tiers[tiers.length - 1].price_eur;
+        warnings.push('weight_over_last_tier');
+      }
+    }
+    standardBase = tierPrice;
+    basePrice = tierPrice;
+    warnings.push('weight_tier_pricing');
+  } else {
+    basePrice = cfg.base_eur + cfg.per_km_eur * distanceKm + cfg.per_kg_eur * totalWeightKg;
+    if (cfg.remote_zone_km > 0 && distanceKm > cfg.remote_zone_km) basePrice += cfg.remote_surcharge_eur;
+    basePrice = Math.max(basePrice, cfg.min_price_eur);
+    standardBase = basePrice;
+  }
+  const standardPrice = subtotal >= cfg.free_over_eur ? 0 : standardBase;
   const options = [];
   const CAP_EUR = 4.5;
   const standardCapped = Math.min(CAP_EUR, standardPrice);
