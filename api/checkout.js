@@ -1,18 +1,16 @@
 import Stripe from "stripe";
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore/lite";
+import { initializeApp as initAdminApp, cert, getApps } from "firebase-admin/app";
+import { getFirestore as getAdminFirestore } from "firebase-admin/firestore";
 
 // Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Firebase (server-side, через env-конфиг)
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Firebase Admin (server-side)
+const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || "{}");
+if (!getApps().length) {
+  initAdminApp({ credential: cert(sa), projectId: sa.project_id || process.env.FIREBASE_PROJECT_ID });
+}
+const db = getAdminFirestore();
 
 // Shipping calc shared helpers (embedded to avoid HTTP call to protected Preview URL)
 const WAREHOUSE_LAT = parseFloat(process.env.WAREHOUSE_LAT || "");
@@ -36,10 +34,10 @@ function _haversineKm(lat1, lon1, lat2, lon2) {
 }
 async function _geocodeAddress(db, address){
   const normalizedId = _normalizeAddressId(address);
-  const cacheRef = doc(db, "geocache", normalizedId);
+  const cacheRef = db.collection("geocache").doc(normalizedId);
   try {
-    const snap = await getDoc(cacheRef);
-    if (snap.exists()) {
+    const snap = await cacheRef.get();
+    if (snap.exists) {
       const data = snap.data();
       if (data?.lat && data?.lon) {
         return { lat: Number(data.lat), lon: Number(data.lon), provider: data.provider || GEOCODER_PROVIDER, cached: true };
@@ -62,13 +60,13 @@ async function _geocodeAddress(db, address){
   if (!Array.isArray(arr) || arr.length === 0) { const err = new Error("Address not found"); err.status=422; err.code="address_not_found"; throw err; }
   const best = arr[0]; const lat = parseFloat(best.lat); const lon = parseFloat(best.lon);
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) { const err = new Error("Invalid geocoder coordinates"); err.status=502; err.code="geocode_invalid"; throw err; }
-  try { await setDoc(cacheRef, { address: String(address), normalized: normalizedId, lat, lon, provider: GEOCODER_PROVIDER, createdAt: new Date().toISOString() }); } catch(e){ console.warn("geocache write error:", e); }
+  try { await cacheRef.set({ address: String(address), normalized: normalizedId, lat, lon, provider: GEOCODER_PROVIDER, createdAt: new Date().toISOString() }); } catch(e){ console.warn("geocache write error:", e); }
   return { lat, lon, provider: GEOCODER_PROVIDER, cached: false };
 }
 async function _loadShippingConfig(db){
-  const ref = doc(db, "shipping_config", "default");
+  const ref = db.collection("shipping_config").doc("default");
   try {
-    const snap = await getDoc(ref); const data = snap.exists() ? snap.data() : {};
+    const snap = await ref.get(); const data = snap.exists ? snap.data() : {};
     return {
       base_eur: _toNumber(data.base_eur, 2),
       per_km_eur: _toNumber(data.per_km_eur, 0.5),
@@ -100,8 +98,8 @@ async function _resolveItemsWeight(db, items){
     const w = Number(raw?.weight); if (Number.isFinite(w) && w >= 0) { totalWeight += w * qty; continue; }
     if (!id) { warnings.push("item_without_id"); continue; }
     try {
-      const snap = await getDoc(doc(db, "products", id));
-      if (!snap.exists()) { warnings.push(`product_not_found:${id}`); continue; }
+      const snap = await db.collection("products").doc(id).get();
+      if (!snap.exists) { warnings.push(`product_not_found:${id}`); continue; }
       const data = snap.data(); const pw = Number(data.weight);
       if (Number.isFinite(pw) && pw >= 0) totalWeight += pw * qty; else warnings.push(`weight_missing:${id}`);
     } catch(e){ console.warn("product read error", id, e); warnings.push(`product_read_error:${id}`); }
@@ -188,8 +186,8 @@ export default async function handler(req, res) {
 
       let product;
       try {
-        const snap = await getDoc(doc(db, "products", id));
-        if (!snap.exists()) continue;
+        const snap = await db.collection("products").doc(id).get();
+        if (!snap.exists) continue;
         product = snap.data();
       } catch (e) {
         console.error("Firestore getDoc error for", id, e);
@@ -253,14 +251,10 @@ export default async function handler(req, res) {
       const serverPrice = Number(chosenOption.price_eur || 0);
       const clientPrice = Number(shipping.price_eur || 0);
 
-      // Если заявленная клиентом цена отличается от серверной > 0.01€, запрашиваем подтверждение на фронте
+      // Если заявленная клиентом цена отличается от серверной > 0.01€ —
+      // продолжаем с серверной ценой без прерывания UX (не возвращаем 409)
       if (Number.isFinite(clientPrice) && Math.abs(serverPrice - clientPrice) > 0.01) {
-        return res.status(409).json({
-          error: "shipping_price_changed",
-          serverOption: chosenOption,
-          options: quote.options,
-          quote,
-        });
+        console.warn("shipping client/server price mismatch, proceeding with server price", { clientPrice, serverPrice });
       }
 
       shippingCents = toCents(serverPrice);
