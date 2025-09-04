@@ -51,6 +51,7 @@
     .loading { background: #fff7f3; color: #b24d2f; border: 1px dashed #f3b197; }
     .error { background: #fff3f3; color: #9c2f2f; border: 1px solid #ffb5b5; }
     .warn { background: #fffdf3; color: #8a6d1a; border: 1px solid #f6e7a1; }
+    .pickup-note { margin-top: 10px; padding: 10px 12px; border-radius: 6px; border: 1px dashed #c6e3ff; background: #f4f9ff; color: #0b5cad; font-size: 14px; }
 
     /* Summary */
     .summary-row { display: flex; justify-content: space-between; margin: 6px 0; }
@@ -111,6 +112,7 @@
 
         <div id="quoteState" class="loading" style="display:none"></div>
         <div id="quoteOptions" class="options"></div>
+        <div id="pickupNote" class="pickup-note" style="display:none">Если есть вопросы — пишите в Telegram: <b>@matvei</b></div>
         <div id="quoteWarnings" class="warn" style="display:none"></div>
 
         <div class="actions">
@@ -141,6 +143,7 @@
   const payBtn = el('payBtn');
   const suggestBox = el('streetSuggest');
   const emailEl = el('email');
+  const pickupNoteEl = el('pickupNote');
 
   function getCart(){ return JSON.parse(localStorage.getItem('cart')||'[]'); }
   function saveCart(c){ localStorage.setItem('cart', JSON.stringify(c)); }
@@ -253,6 +256,7 @@
       stateEl.style.display = 'none';
       optionsEl.innerHTML = '';
       warningsEl.style.display = 'none';
+      if (pickupNoteEl) pickupNoteEl.style.display = 'none';
       payBtn.disabled = true;
       updateSummary();
       return;
@@ -300,6 +304,7 @@
       stateEl.style.display = 'block';
       stateEl.className = 'error';
       stateEl.textContent = String(err.message||err);
+      if (pickupNoteEl) pickupNoteEl.style.display = 'none';
       payBtn.disabled = true;
       currentShippingPrice = null;
       updateSummary();
@@ -313,6 +318,7 @@
     const opts = Array.isArray(quote.options) ? quote.options : [];
     if (!opts.length){
       optionsEl.innerHTML = '<div class="error">Нет доступных способов доставки</div>';
+      if (pickupNoteEl) pickupNoteEl.style.display = 'none';
       currentShippingPrice = null;
       updateSummary();
       return;
@@ -343,6 +349,7 @@
         currentShippingPrice = o ? Number(o.price_eur||0) : null;
         updateSummary(o);
         updatePayState();
+        if (pickupNoteEl) pickupNoteEl.style.display = (selectedOptionId === 'pickup') ? 'block' : 'none';
       });
     });
 
@@ -350,6 +357,7 @@
     currentShippingPrice = selected ? Number(selected.price_eur||0) : null;
     updateSummary(selected);
     updatePayState();
+    if (pickupNoteEl) pickupNoteEl.style.display = (selected && selected.id === 'pickup') ? 'block' : 'none';
 
     // Warnings (e.g., missing weights)
     const warnList = (quote.warnings || []).filter(w => !['weight_tier_pricing','address_postal_fallback'].includes(w));
