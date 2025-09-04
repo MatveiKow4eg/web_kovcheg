@@ -74,16 +74,15 @@ export default async function handler(req, res) {
     const chatId = chatIdRaw != null ? String(chatIdRaw) : null;
     const text = String(msg.text || '').trim();
 
-    const isAdmin = ADMIN_IDS.length === 0 ? false : ADMIN_IDS.includes(chatId);
-    if (!isAdmin) {
-      // Мягкий ответ для не-админов
-      await tgSend(chatId, '⛔ Доступ ограничен.');
+    // Публичные команды
+    if (/^\/(start|help)\b/i.test(text)) {
+      await tgSend(chatId, 'Команды:\n• /orders [N] — последние N заказов (по умолчанию 10)\n• /order <id> — детали заказа по ID');
       return res.status(200).json({ ok: true });
     }
 
-    // Команды
-    if (/^\/(start|help)\b/i.test(text)) {
-      await tgSend(chatId, 'Команды:\n• /orders [N] — последние N заказов (по умолчанию 10)\n• /order <id> — детали заказа по ID (Stripe session id)');
+    const isAdmin = ADMIN_IDS.length === 0 ? false : ADMIN_IDS.includes(chatId);
+    if (!isAdmin) {
+      await tgSend(chatId, '⛔ Доступ ограничен.');
       return res.status(200).json({ ok: true });
     }
 
@@ -125,7 +124,8 @@ export default async function handler(req, res) {
       const shipStr = shipping.method === 'pickup'
         ? 'Самовывоз (0 €)'
         : `Доставка — ${fmtCurrency(shipping.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
-      const body = `\n<b>Заказ:</b> ${o.id}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${o.email || '-'}\n<b>Сумма:</b> ${total}\n<b>Доставка:</b> ${shipStr}\n\n<b>Позиции:</b>\n${itemsLines}`;
+      const addr = shipping.address ? `\n<b>Адрес:</b> ${shipping.address}\n<a href="https://maps.google.com/?q=${encodeURIComponent(shipping.address)}">Открыть на карте</a>` : '';
+      const body = `\n<b>Заказ:</b> ${o.id}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${o.email || '-'}\n<b>Сумма:</b> ${total}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
       for (const part of chunk(body)) { await tgSend(chatId, part); }
       return res.status(200).json({ ok: true });
     }
