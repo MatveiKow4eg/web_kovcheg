@@ -228,54 +228,20 @@ export default async function handler(req, res) {
     let shippingCents = 0;
     let shippingMeta = {};
 
-    if (shipping && shipping.address && shipping.optionId) {
-      // Запрос к нашему shipping-quote, используя серверный subtotal и товары
-      let quote;
-      try {
-        quote = await calcServerShippingQuote({
-          address: String(shipping.address),
-          subtotal: productsSubtotalCents / 100,
-          items: quoteItems,
-        });
-      } catch (e) {
-        const status = Number(e?.status) || 400;
-        const message = e?.message || String(e);
-        console.error("shipping calc failed:", status, message);
-        return res.status(400).json({ error: "shipping_quote_failed", status, message });
-      }
-      chosenOption = (quote.options || []).find((o) => o.id === String(shipping.optionId));
-      if (!chosenOption) {
-        return res.status(400).json({ error: "shipping_option_invalid", options: quote.options });
-      }
-
-      const serverPrice = Number(chosenOption.price_eur || 0);
-      const clientPrice = Number(shipping.price_eur || 0);
-
-      // Если заявленная клиентом цена отличается от серверной > 0.01€ —
-      // продолжаем с серверной ценой без прерывания UX (не возвращаем 409)
-      if (Number.isFinite(clientPrice) && Math.abs(serverPrice - clientPrice) > 0.01) {
-        console.warn("shipping client/server price mismatch, proceeding with server price", { clientPrice, serverPrice });
-      }
-
-      shippingCents = toCents(serverPrice);
+    if (shipping && shipping.address) {
+      const serverPriceEur = 4.5; // фиксированная доставка
+      shippingCents = toCents(serverPriceEur);
       shippingMeta = {
-        shipping_method: String(chosenOption.id),
-        shipping_option_label: String(chosenOption.label || chosenOption.id),
-        shipping_address: String(quote.address || shipping.address || ""),
-        shipping_lat: String(quote?.coords?.lat ?? shipping.lat ?? ""),
-        shipping_lon: String(quote?.coords?.lon ?? shipping.lon ?? ""),
+        shipping_method: "flat",
+        shipping_option_label: "Фиксированная",
+        shipping_address: String(shipping.address || ""),
         shipping_price_cents: String(shippingCents),
-        shipping_distance_km: String(quote?.distance_km ?? ""),
-        shipping_weight_kg: String(quote?.total_weight_kg ?? ""),
       };
-
-      if (chosenOption.id !== "pickup" && shippingCents > 0) {
+      if (shippingCents > 0) {
         lineItems.push({
           price_data: {
             currency: "eur",
-            product_data: {
-              name: `Доставка — ${chosenOption.label || chosenOption.id}`,
-            },
+            product_data: { name: `Доставка — Фиксированная` },
             unit_amount: shippingCents,
           },
           quantity: 1,
