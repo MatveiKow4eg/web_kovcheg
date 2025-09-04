@@ -352,7 +352,7 @@
     updatePayState();
 
     // Warnings (e.g., missing weights)
-    const warnList = (quote.warnings || []).filter(w => w !== 'weight_tier_pricing');
+    const warnList = (quote.warnings || []).filter(w => !['weight_tier_pricing','address_postal_fallback'].includes(w));
     if (warnList.length){
       warningsEl.style.display = 'block';
       warningsEl.innerHTML = '<b>Примечания:</b> ' + warnList.map(escapeHtml).join(', ');

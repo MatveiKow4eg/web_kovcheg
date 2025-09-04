@@ -114,9 +114,12 @@ async function calcServerShippingQuote({ address, subtotal, items }){
   basePrice = Math.max(basePrice, cfg.min_price_eur);
   const standardPrice = subtotal >= cfg.free_over_eur ? 0 : basePrice;
   const options = [];
-  options.push({ id:"standard", label:"Стандарт", price_eur: _roundMoneyEUR(standardPrice), eta_days:2 });
+  const CAP_EUR = 4.5;
+  const standardCapped = Math.min(CAP_EUR, standardPrice);
+  options.push({ id:"standard", label:"Стандарт", price_eur: _roundMoneyEUR(standardCapped), eta_days:2 });
   const expressPrice = Math.max(standardPrice, basePrice) * cfg.express_multiplier;
-  options.push({ id:"express", label:"Экспресс", price_eur: _roundMoneyEUR(expressPrice), eta_days:1 });
+  const expressCapped = Math.min(CAP_EUR, expressPrice);
+  options.push({ id:"express", label:"Экспресс", price_eur: _roundMoneyEUR(expressCapped), eta_days:1 });
   if (cfg.pickup_enabled) options.push({ id:"pickup", label:"Самовывоз", price_eur: 0, eta_days:0 });
   return {
     address,

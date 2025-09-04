@@ -350,18 +350,21 @@ export default async function handler(req, res) {
 
     const options = [];
 
+    const CAP_EUR = 4.5;
+    const standardCapped = Math.min(CAP_EUR, standardPrice);
     options.push({
       id: "standard",
       label: "Стандарт",
-      price_eur: roundMoneyEUR(standardPrice),
+      price_eur: roundMoneyEUR(standardCapped),
       eta_days: 2,
     });
 
     const expressPrice = Math.max(standardPrice, basePrice) * cfg.express_multiplier;
+    const expressCapped = Math.min(CAP_EUR, expressPrice);
     options.push({
       id: "express",
       label: "Экспресс",
-      price_eur: roundMoneyEUR(expressPrice),
+      price_eur: roundMoneyEUR(expressCapped),
       eta_days: 1,
     });
 
