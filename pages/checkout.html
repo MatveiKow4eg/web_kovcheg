@@ -294,7 +294,7 @@
       }
       renderOptions(data);
       stateEl.style.display = 'none';
-      payBtn.disabled = false;
+      updatePayState();
     } catch(err){
       optionsEl.innerHTML = '';
       stateEl.style.display = 'block';
