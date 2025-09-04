@@ -76,7 +76,7 @@ export default async function handler(req, res) {
 
     // Публичные команды
     if (/^\/(start|help)\b/i.test(text)) {
-      await tgSend(chatId, 'Команды:\n• /orders [N] — последние N заказов (по умолчанию 10)\n• /order <id> — детали заказа по ID');
+      await tgSend(chatId, 'Команды:\n• /orders [N] — последние N заказов (по умолчанию 10)\n• /order &lt;id&gt; — детали заказа по ID');
       return res.status(200).json({ ok: true });
     }
 
@@ -98,7 +98,7 @@ export default async function handler(req, res) {
         const created = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
         const dt = created ? fmtDate(created) : '-';
         const total = fmtCurrency(o.total || 0, String(o.currency || 'EUR').toUpperCase());
-        return `${i + 1}. <b>${o.id}</b> — ${total}\n${o.email || '-'} | ${o.status || ''} | ${dt}`;
+        return `${i + 1}. <b>${(o.id || '').replace(/[&<>"']/g, '')}</b> — ${total}\n${(o.email || '-').replace(/[&<>"']/g, '')} | ${(o.status || '').replace(/[&<>"']/g, '')} | ${dt}`;
       });
       const textOut = `<b>Последние заказы (${orders.length})</b>\n\n` + lines.join('\n\n');
       for (const part of chunk(textOut)) { await tgSend(chatId, part); }
@@ -118,14 +118,15 @@ export default async function handler(req, res) {
       const total = fmtCurrency(o.total || 0, String(o.currency || 'EUR').toUpperCase());
       const shipping = o.shipping || {};
       const items = Array.isArray(o.items) ? o.items : [];
+      const esc = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;');
       const itemsLines = items.length
-        ? items.map((it) => `• ${it.name || 'Товар'} × ${it.quantity || 1} — ${fmtCurrency(it.amount_total || 0, String(it.currency || o.currency || 'EUR').toUpperCase())}`).join('\n')
+        ? items.map((it) => `• ${esc(it.name || 'Товар')} × ${it.quantity || 1} — ${fmtCurrency(it.amount_total || 0, String(it.currency || o.currency || 'EUR').toUpperCase())}`).join('\n')
         : '—';
       const shipStr = shipping.method === 'pickup'
         ? 'Самовывоз (0 €)'
         : `Доставка — ${fmtCurrency(shipping.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
-      const addr = shipping.address ? `\n<b>Адрес:</b> ${shipping.address}\n<a href="https://maps.google.com/?q=${encodeURIComponent(shipping.address)}">Открыть на карте</a>` : '';
-      const body = `\n<b>Заказ:</b> ${o.id}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${o.email || '-'}\n<b>Сумма:</b> ${total}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
+      const addr = shipping.address ? `\n<b>Адрес:</b> ${esc(shipping.address)}\n<a href=\"https://maps.google.com/?q=${encodeURIComponent(shipping.address)}\">Открыть на карте</a>` : '';
+      const body = `\n<b>Заказ:</b> ${esc(o.id)}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${esc(o.email || '-')}\n<b>Сумма:</b> ${total}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
       for (const part of chunk(body)) { await tgSend(chatId, part); }
       return res.status(200).json({ ok: true });
     }
