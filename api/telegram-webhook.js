@@ -28,6 +28,21 @@ async function tgSend(chatId, text, extra = {}) {
   }
 }
 
+async function tgSendDocument(chatId, filename, content, caption = ''){
+  if (!BOT_TOKEN) throw new Error('TELEGRAM_BOT_TOKEN is not configured');
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`;
+  const form = new FormData();
+  form.append('chat_id', chatId);
+  if (caption) form.append('caption', caption);
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
+  form.append('document', blob, filename);
+  const resp = await fetch(url, { method: 'POST', body: form });
+  if (!resp.ok) {
+    const t = await resp.text().catch(() => '');
+    throw new Error(`Telegram sendDocument failed: ${resp.status} ${resp.statusText} ${t}`);
+  }
+}
+
 function fmtCurrency(amount, currency = 'EUR') {
   try { return new Intl.NumberFormat('ru-EE', { style: 'currency', currency }).format(amount); }
   catch { return `${Number(amount).toFixed(2)} ${String(currency).toUpperCase()}`; }
@@ -42,14 +57,28 @@ function fmtDateOnly(d){ try { return new Intl.DateTimeFormat('ru-RU', { timeZon
 function fmtTimeHM(d){ try { return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Tallinn', hour: '2-digit', minute: '2-digit' }).format(new Date(d)); } catch { return ''; } }
 function fmtWeekday(d){ try { return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Tallinn', weekday: 'short' }).format(new Date(d)); } catch { return ''; } }
 
-async function listOrders(limit = 10) {
-  const snap = await db.collection('orders').orderBy('createdAt', 'desc').limit(Math.max(1, Math.min(50, limit))).get();
+async function listOrders(arg = 10) {
+  const opts = typeof arg === 'object' && arg !== null ? arg : { limit: arg };
+  const limit = Math.max(1, Math.min(50, Number(opts.limit) || 10));
+  let q = db.collection('orders').orderBy('createdAt', 'desc');
+  if (opts.status && opts.status !== 'all') q = q.where('status', '==', String(opts.status));
+  if (opts.beforeTs) q = q.where('createdAt', '<', new Date(Number(opts.beforeTs)));
+  if (opts.periodStart) q = q.where('createdAt', '>=', new Date(Number(opts.periodStart)));
+  if (opts.periodEnd) q = q.where('createdAt', '<', new Date(Number(opts.periodEnd)));
+  const snap = await q.limit(limit).get();
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
 async function getOrder(id) {
   const doc = await db.collection('orders').doc(String(id)).get();
-  return doc.exists ? { id: doc.id, ...doc.data() } : null;
+  if (!doc.exists) return null;
+  const data = { id: doc.id, ...doc.data() };
+  if (!data.orderNumber || !data.email_lower) {
+    await ensureOrderNumberAndLower(doc.id, data);
+    const doc2 = await db.collection('orders').doc(String(id)).get();
+    return doc2.exists ? { id: doc2.id, ...doc2.data() } : data;
+  }
+  return data;
 }
 
 function chunk(str, n = 3800) {
@@ -87,6 +116,46 @@ function maskEmail(email){
   return `${localMasked}@${domain}`;
 }
 
+function statusBadge(status){
+  const s = String(status || '').toLowerCase();
+  if (s === 'paid') return '💳';
+  if (s === 'done') return '✅';
+  if (s === 'shipped') return '📦';
+  if (s === 'canceled') return '❌';
+  return '';
+}
+function fmtDateKeyTallinn(d){
+  try {
+    const date = new Date(d);
+    const y = Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Tallinn', year: 'numeric' }).format(date));
+    const m = Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Tallinn', month: '2-digit' }).format(date));
+    const day = Number(new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Tallinn', day: '2-digit' }).format(date));
+    return `${y}${String(m).padStart(2,'0')}${String(day).padStart(2,'0')}`;
+  } catch { return ''; }
+}
+async function ensureOrderNumberAndLower(id, order){
+  try {
+    if (!id || !order) return;
+    if (order.orderNumber && order.email_lower) return;
+    const created = order.createdAt && order.createdAt.toDate ? order.createdAt.toDate() : order.createdAt || new Date();
+    const dateKey = fmtDateKeyTallinn(created);
+    const ctrRef = db.collection('counters').doc(`order-${dateKey}`);
+    const ordRef = db.collection('orders').doc(String(id));
+    await db.runTransaction(async (tx) => {
+      const [ctrSnap, ordSnap] = await Promise.all([tx.get(ctrRef), tx.get(ordRef)]);
+      const data = ordSnap.exists ? ordSnap.data() : {};
+      const needNumber = !data.orderNumber;
+      let seq = ctrSnap.exists && typeof ctrSnap.data().seq === 'number' ? ctrSnap.data().seq : 0;
+      if (needNumber) { seq += 1; tx.set(ctrRef, { seq, updatedAt: FieldValue.serverTimestamp() }, { merge: true }); }
+      const patch = {};
+      if (needNumber) patch.orderNumber = `${dateKey}-${String(seq).padStart(3,'0')}`;
+      if (data.email && !data.email_lower) patch.email_lower = String(data.email).toLowerCase();
+      if (data.phone && !data.phone_lower) patch.phone_lower = String(data.phone).toLowerCase();
+      if (Object.keys(patch).length) tx.set(ordRef, patch, { merge: true });
+    });
+  } catch (e) { /* noop */ }
+}
+
 function shortId(id, n = 12){ const s = String(id||''); return s.slice(-Math.max(4, Math.min(48, n))); }
 
 async function resolveOrderByShort(suffix){
@@ -96,14 +165,21 @@ async function resolveOrderByShort(suffix){
   return null;
 }
 
-function orderListKeyboard(orders){
+function orderListKeyboard(orders, opts = {}){
   const rows = orders.map(o => {
     const sid = shortId(o.id, 12);
     const created = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
     const label = created ? `${fmtDateOnly(created)} ${fmtTimeHM(created)}` : `№${shortId(o.id, 6)}`;
     return [{ text: `ℹ️ ${label}`, callback_data: `order:${sid}` }];
   });
-  rows.push([{ text: '🔄 Обновить', callback_data: 'orders:refresh' }]);
+  const limit = Math.max(1, Math.min(50, Number(opts.limit) || 10));
+  const last = orders[orders.length - 1];
+  const lastCreated = last && (last.createdAt && last.createdAt.toDate ? last.createdAt.toDate() : last.createdAt);
+  const beforeTs = lastCreated ? new Date(lastCreated).getTime() : '';
+  const navRow = [];
+  if (beforeTs) navRow.push({ text: '▶️ Далее', callback_data: `orders:next|b=${beforeTs}|l=${limit}` });
+  navRow.push({ text: '🔄 Обновить', callback_data: 'orders:list' });
+  rows.push(navRow);
   return { inline_keyboard: rows };
 }
 
@@ -163,7 +239,7 @@ export default async function handler(req, res) {
           : '—';
         const shipStr = shipping.method === 'pickup' ? 'Самовывоз (0 €)' : `Доставка — ${fmtCurrency(shipping.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
         const addr = shipping.address ? `\n<b>Адрес:</b> ${escapeHtml(shipping.address)}\n<a href=\"https://maps.google.com/?q=${encodeURIComponent(shipping.address)}\">Открыть на карте</a>` : '';
-        const body = `\n<b>Заказ:</b> №${shortId(o.id, 6)}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${escapeHtml(o.email || '-')}\n<b>Сумма:</b> ${total}\n<b>Статус:</b> ${escapeHtml(o.status || '')}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
+        const body = `\n<b>Заказ:</b> №${shortId(o.id, 6)}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${escapeHtml(o.email || '-')}\n<b>Сумма:</b> ${total}\n<b>Статус:</b> ${statusBadge(o.status)} ${escapeHtml(o.status || '')}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
         await tgEditMessageText(chatId, msgId, body, orderDetailKeyboard(o));
         await tgAnswerCallbackQuery(cq.id);
         return res.status(200).json({ ok: true });
@@ -186,14 +262,14 @@ export default async function handler(req, res) {
           : '—';
         const shipStr = shipping.method === 'pickup' ? 'Самовывоз (0 €)' : `Доставка — ${fmtCurrency(shipping.price_eur || 0, String(updated.currency || 'EUR').toUpperCase())}`;
         const addr = shipping.address ? `\n<b>Адрес:</b> ${escapeHtml(shipping.address)}\n<a href=\"https://maps.google.com/?q=${encodeURIComponent(shipping.address)}\">Открыть на карте</a>` : '';
-        const body = `\n<b>Заказ:</b> №${shortId(updated.id, 6)}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${escapeHtml(updated.email || '-')}\n<b>Сумма:</b> ${total}\n<b>Статус:</b> ${escapeHtml(updated.status || '')}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
+        const body = `\n<b>Заказ:</b> №${shortId(updated.id, 6)}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${escapeHtml(updated.email || '-')}\n<b>Сумма:</b> ${total}\n<b>Статус:</b> ${statusBadge(updated.status)} ${escapeHtml(updated.status || '')}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
         await tgEditMessageText(chatId, msgId, body, orderDetailKeyboard(updated));
         await tgAnswerCallbackQuery(cq.id, 'Статус обновлён');
         return res.status(200).json({ ok: true });
       }
 
       if (data === 'orders:list' || data === 'orders:refresh') {
-        const orders = await listOrders(10);
+        const orders = await listOrders({ limit: 10 });
         if (!orders.length) {
           await tgEditMessageText(chatId, msgId, 'Заказов не найдено.');
           await tgAnswerCallbackQuery(cq.id);
@@ -210,7 +286,7 @@ export default async function handler(req, res) {
           const shipStr = ship.method === 'pickup' ? 'Самовывоз' : `Доставка ${fmtCurrency(ship.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
           const addrShort = ship.address ? String(ship.address).split(',')[0] : '';
           const timeStr = created ? fmtTimeHM(created) : '';
-          const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${escapeHtml(o.status || '')}\n${shipStr}${addrShort ? ' — ' + escapeHtml(addrShort) : ''}`;
+          const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${statusBadge(o.status)} ${escapeHtml(o.status || '')}\n${shipStr}${addrShort ? ' — ' + escapeHtml(addrShort) : ''}`;
           groupMap.get(dateKey).items.push(line);
         }
         const parts = [];
@@ -219,11 +295,46 @@ export default async function handler(req, res) {
           parts.push(items.join('\n\n'));
         }
         const textOut = `<b>Последние заказы (${orders.length})</b>\n\n` + parts.join('\n\n');
-        await tgEditMessageText(chatId, msgId, textOut, orderListKeyboard(orders));
+        await tgEditMessageText(chatId, msgId, textOut, orderListKeyboard(orders, { limit: 10 }));
         await tgAnswerCallbackQuery(cq.id);
         return res.status(200).json({ ok: true });
       }
 
+      await tgAnswerCallbackQuery(cq.id);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (/^orders:next\|/.test(data)) {
+      const m = data.match(/\bb=(\d+)\b/);
+      const mL = data.match(/\bl=(\d+)\b/);
+      const beforeTs = m ? Number(m[1]) : undefined;
+      const limit = mL ? Number(mL[1]) : 10;
+      const orders = await listOrders({ limit, beforeTs });
+      if (!orders.length) {
+        await tgAnswerCallbackQuery(cq.id, 'Больше нет записей');
+        return res.status(200).json({ ok: true });
+      }
+      const groupMap = new Map();
+      for (const o of orders) {
+        const created = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+        const dateKey = created ? fmtDateOnly(created) : 'Без даты';
+        const header = created ? `${fmtDateOnly(created)} (${fmtWeekday(created)})` : 'Без даты';
+        if (!groupMap.has(dateKey)) groupMap.set(dateKey, { header, items: [] });
+        const total = fmtCurrency(o.total || 0, String(o.currency || 'EUR').toUpperCase());
+        const ship = o.shipping || {};
+        const shipStr = ship.method === 'pickup' ? 'Самовывоз' : `Доставка ${fmtCurrency(ship.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
+        const addrShort = ship.address ? String(ship.address).split(',')[0] : '';
+        const timeStr = created ? fmtTimeHM(created) : '';
+        const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${statusBadge(o.status)} ${escapeHtml(o.status || '')}\n${shipStr}${addrShort ? ' — ' + escapeHtml(addrShort) : ''}`;
+        groupMap.get(dateKey).items.push(line);
+      }
+      const parts = [];
+      for (const { header, items } of groupMap.values()) {
+        parts.push(`<b>${header}</b>`);
+        parts.push(items.join('\n\n'));
+      }
+      const textOut = `<b>Последние заказы (${orders.length})</b>\n\n` + parts.join('\n\n');
+      await tgEditMessageText(chatId, msgId, textOut, orderListKeyboard(orders, { limit }));
       await tgAnswerCallbackQuery(cq.id);
       return res.status(200).json({ ok: true });
     }
@@ -252,7 +363,7 @@ export default async function handler(req, res) {
     const mOrders = text.match(/^\/orders(?:\s+(\d+))?$/i);
     if (mOrders) {
       const limit = mOrders[1] ? Number(mOrders[1]) : 10;
-      const orders = await listOrders(limit);
+      const orders = await listOrders({ limit });
       if (!orders.length) {
         await tgSend(chatId, 'Заказов не найдено.');
         return res.status(200).json({ ok: true });
@@ -265,7 +376,7 @@ export default async function handler(req, res) {
         if (!groupMap.has(dateKey)) groupMap.set(dateKey, { header, items: [] });
         const total = fmtCurrency(o.total || 0, String(o.currency || 'EUR').toUpperCase());
         const timeStr = created ? fmtTimeHM(created) : '';
-        const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${escapeHtml(o.status || '')}`;
+        const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${statusBadge(o.status)} ${escapeHtml(o.status || '')}`;
         groupMap.get(dateKey).items.push(line);
       }
       const parts = [];
@@ -274,7 +385,70 @@ export default async function handler(req, res) {
         parts.push(items.join('\n\n'));
       }
       const textOut = `<b>Последние заказы (${orders.length})</b>\n\n` + parts.join('\n\n');
-      await tgSend(chatId, textOut, { reply_markup: orderListKeyboard(orders) });
+      await tgSend(chatId, textOut, { reply_markup: orderListKeyboard(orders, { limit }) });
+      return res.status(200).json({ ok: true });
+    }
+
+    const mFind = text.match(/^\/find\s+(.+)$/i);
+    if (mFind) {
+      const qraw = mFind[1].trim();
+      const q = qraw.toLowerCase();
+      const results = [];
+      if (qraw.length) {
+        const snapNum = await db.collection('orders').where('orderNumber','==', qraw).orderBy('createdAt', 'desc').limit(10).get().catch(()=>null);
+        if (snapNum && !snapNum.empty) results.push(...snapNum.docs.map(d=>({ id: d.id, ...d.data() })));
+      }
+      if (results.length < 10) {
+        const recent = await listOrders({ limit: 50 });
+        const filtered = recent.filter(o => String(o.email||'').toLowerCase().includes(q) || String(o.orderNumber||'').toLowerCase().includes(q));
+        for (const o of filtered) { if (results.length < 10) results.push(o); else break; }
+      }
+      if (!results.length) {
+        await tgSend(chatId, 'Ничего не найдено.');
+        return res.status(200).json({ ok: true });
+      }
+      const lines = results.map((o, i) => {
+        const created = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+        const dt = created ? fmtDate(created) : '-';
+        const total = fmtCurrency(o.total || 0, String(o.currency || 'EUR').toUpperCase());
+        const num = o.orderNumber ? o.orderNumber : `№${shortId(o.id, 6)}`;
+        return `${i + 1}. <b>${escapeHtml(num)}</b> — ${total}\n${escapeHtml(maskEmail(o.email))} | ${statusBadge(o.status)} ${escapeHtml(o.status || '')} | ${dt}`;
+      });
+      const textOut = `<b>Найденные заказы (${results.length})</b>\n\n` + lines.join('\n\n');
+      await tgSend(chatId, textOut);
+      return res.status(200).json({ ok: true });
+    }
+
+    const mExport = text.match(/^\/export(?:\s+(\d+))?$/i);
+    if (mExport) {
+      const limit = Math.max(1, Math.min(200, mExport[1] ? Number(mExport[1]) : 30));
+      const orders = await listOrders({ limit });
+      if (!orders.length) { await tgSend(chatId, 'Заказов не найдено.'); return res.status(200).json({ ok: true }); }
+      const header = ['orderNumber','id','createdAt','email','status','total','currency','shipping_method','shipping_price_eur','address','itemsCount'];
+      const rows = [header.join(';')];
+      for (const o of orders) {
+        const created = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+        const dt = created ? fmtDate(created) : '';
+        const itemsCount = Array.isArray(o.items) ? o.items.length : 0;
+        const ship = o.shipping || {};
+        const vals = [
+          String(o.orderNumber || '').replace(/;/g, ' '),
+          String(o.id || '').replace(/;/g, ' '),
+          String(dt).replace(/;/g, ' '),
+          String(o.email || '').replace(/;/g, ' '),
+          String(o.status || '').replace(/;/g, ' '),
+          String(o.total || '').replace(/;/g, ' '),
+          String((o.currency || 'EUR')).replace(/;/g, ' '),
+          String(ship.method || '').replace(/;/g, ' '),
+          String(ship.price_eur || '').replace(/;/g, ' '),
+          String(ship.address || '').replace(/;/g, ' '),
+          String(itemsCount)
+        ];
+        rows.push(vals.map(v => `"${v.replace(/"/g,'\\"')}"`).join(';'));
+      }
+      const csv = '\uFEFF' + rows.join('\n');
+      const todayKey = fmtDateKeyTallinn(new Date());
+      await tgSendDocument(chatId, `orders-${todayKey}.csv`, csv, `Экспорт ${orders.length} заказов`);
       return res.status(200).json({ ok: true });
     }
 
@@ -299,7 +473,7 @@ export default async function handler(req, res) {
         ? 'Самовывоз (0 €)'
         : `Доставка — ${fmtCurrency(shipping.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
       const addr = shipping.address ? `\n<b>Адрес:</b> ${esc(shipping.address)}\n<a href=\"https://maps.google.com/?q=${encodeURIComponent(shipping.address)}\">Открыть на карте</a>` : '';
-      const body = `\n<b>Заказ:</b> №${shortId(o.id, 6)}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${esc(o.email || '-')}\n<b>Сумма:</b> ${total}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
+      const body = `\n<b>Заказ:</b> №${shortId(o.id, 6)}\n<b>Дата:</b> ${dt}\n<b>Клиент:</b> ${esc(o.email || '-')}\n<b>Сумма:</b> ${total}\n<b>Статус:</b> ${statusBadge(o.status)} ${esc(o.status || '')}\n<b>Доставка:</b> ${shipStr}${addr}\n\n<b>Позиции:</b>\n${itemsLines}`;
       await tgSend(chatId, body, { reply_markup: orderDetailKeyboard(o) });
       return res.status(200).json({ ok: true });
     }
