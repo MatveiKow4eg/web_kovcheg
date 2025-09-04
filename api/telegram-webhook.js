@@ -70,17 +70,30 @@ async function tgEditMessageText(chatId, messageId, text, reply_markup) {
 
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;'); }
 
+function shortId(id, n = 12){ const s = String(id||''); return s.slice(-Math.max(4, Math.min(48, n))); }
+
+async function resolveOrderByShort(suffix){
+  const suf = String(suffix||'');
+  const snap = await db.collection('orders').orderBy('createdAt','desc').limit(50).get();
+  for (const d of snap.docs){ if (String(d.id).endsWith(suf)) return { id: d.id, ...d.data() }; }
+  return null;
+}
+
 function orderListKeyboard(orders){
-  const rows = orders.map(o => [{ text: `ℹ️ ${String(o.id).slice(-8)}`, callback_data: `order:${o.id}` }]);
+  const rows = orders.map(o => {
+    const sid = shortId(o.id, 12);
+    return [{ text: `ℹ️ ${String(o.id).slice(-8)}`, callback_data: `order:${sid}` }];
+  });
   rows.push([{ text: '🔄 Обновить', callback_data: 'orders:refresh' }]);
   return { inline_keyboard: rows };
 }
 
 function orderDetailKeyboard(o){
   const done = String(o.status||'') === 'done';
+  const sid = shortId(o.id, 12);
   return {
     inline_keyboard: [
-      [{ text: done ? '↩️ Вернуть в оплачено' : '✅ Отметить выполненным', callback_data: `done:${o.id}` }],
+      [{ text: done ? '↩️ Вернуть в оплачено' : '✅ Отметить выполненным', callback_data: `done:${sid}` }],
       [{ text: '⬅️ К списку', callback_data: 'orders:list' }],
     ]
   };
@@ -118,8 +131,8 @@ export default async function handler(req, res) {
       }
 
       if (/^order:\s*(\S+)$/i.test(data)) {
-        const id = data.replace(/^order:\s*/i, '');
-        const o = await getOrder(id);
+        const suf = data.replace(/^order:\s*/i, '');
+        const o = await resolveOrderByShort(suf);
         if (!o) { await tgAnswerCallbackQuery(cq.id, 'Заказ не найден'); return res.status(200).json({ ok: true }); }
         const created = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
         const dt = created ? fmtDate(created) : '-';
@@ -138,12 +151,12 @@ export default async function handler(req, res) {
       }
 
       if (/^done:\s*(\S+)$/i.test(data)) {
-        const id = data.replace(/^done:\s*/i, '');
-        const o = await getOrder(id);
+        const suf = data.replace(/^done:\s*/i, '');
+        const o = await resolveOrderByShort(suf);
         if (!o) { await tgAnswerCallbackQuery(cq.id, 'Заказ не найден'); return res.status(200).json({ ok: true }); }
         const newStatus = String(o.status||'') === 'done' ? 'paid' : 'done';
-        await setOrderStatus(id, newStatus);
-        const updated = await getOrder(id);
+        await setOrderStatus(o.id, newStatus);
+        const updated = await getOrder(o.id);
         const created = updated.createdAt && updated.createdAt.toDate ? updated.createdAt.toDate() : updated.createdAt;
         const dt = created ? fmtDate(created) : '-';
         const total = fmtCurrency(updated.total || 0, String(updated.currency || 'EUR').toUpperCase());
