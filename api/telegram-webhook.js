@@ -17,14 +17,14 @@ const ADMIN_IDS = String(process.env.TELEGRAM_ADMIN_CHAT_IDS || '')
 async function tgSend(chatId, text, extra = {}) {
   if (!BOT_TOKEN) throw new Error('TELEGRAM_BOT_TOKEN is not configured');
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-  const resp = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true, ...extra }),
-  });
-  if (!resp.ok) {
-    const t = await resp.text().catch(() => '');
-    throw new Error(`Telegram sendMessage failed: ${resp.status} ${resp.statusText} ${t}`);
+  const parts = chunk(String(text || ''), 3800);
+  for (let i = 0; i < parts.length; i++) {
+    const body = { chat_id: chatId, text: parts[i], parse_mode: 'HTML', disable_web_page_preview: true, ...(i === 0 ? extra : {}) };
+    const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!resp.ok) {
+      const t = await resp.text().catch(() => '');
+      throw new Error(`Telegram sendMessage failed: ${resp.status} ${resp.statusText} ${t}`);
+    }
   }
 }
 
@@ -34,13 +34,13 @@ function fmtCurrency(amount, currency = 'EUR') {
 }
 
 function fmtDate(d) {
-  try { return new Date(d).toLocaleString('ru-RU'); } catch { return String(d); }
+  try { return new Date(d).toLocaleString('ru-RU', { timeZone: 'Europe/Tallinn' }); } catch { return String(d); }
 }
 
 function pad2(n){ return String(n).padStart(2,'0'); }
-function fmtDateOnly(d){ try { const x = new Date(d); return `${pad2(x.getDate())}.${pad2(x.getMonth()+1)}.${x.getFullYear()}`; } catch { return String(d); } }
-function fmtTimeHM(d){ try { const x = new Date(d); return `${pad2(x.getHours())}:${pad2(x.getMinutes())}`; } catch { return ''; } }
-function fmtWeekday(d){ try { return new Intl.DateTimeFormat('ru-RU', { weekday: 'short' }).format(new Date(d)); } catch { return ''; } }
+function fmtDateOnly(d){ try { return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Tallinn', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(d)); } catch { return String(d); } }
+function fmtTimeHM(d){ try { return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Tallinn', hour: '2-digit', minute: '2-digit' }).format(new Date(d)); } catch { return ''; } }
+function fmtWeekday(d){ try { return new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Tallinn', weekday: 'short' }).format(new Date(d)); } catch { return ''; } }
 
 async function listOrders(limit = 10) {
   const snap = await db.collection('orders').orderBy('createdAt', 'desc').limit(Math.max(1, Math.min(50, limit))).get();
@@ -67,13 +67,25 @@ async function tgAnswerCallbackQuery(callbackQueryId, text = '') {
 
 async function tgEditMessageText(chatId, messageId, text, reply_markup) {
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`;
-  const body = { chat_id: chatId, message_id: messageId, text, parse_mode: 'HTML', disable_web_page_preview: true };
+  let t = String(text || '');
+  if (t.length > 3800) t = t.slice(0, 3800);
+  const body = { chat_id: chatId, message_id: messageId, text: t, parse_mode: 'HTML', disable_web_page_preview: true };
   if (reply_markup) body.reply_markup = reply_markup;
   const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   if (!resp.ok) { const t = await resp.text().catch(()=> ''); console.warn('editMessageText failed', resp.status, t); }
 }
 
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#039;'); }
+function maskEmail(email){
+  const e = String(email || '').trim();
+  if (!e || e === '-') return '-';
+  const at = e.indexOf('@');
+  if (at <= 0) return e.length > 1 ? e[0] + '***' : e;
+  const local = e.slice(0, at);
+  const domain = e.slice(at + 1);
+  const localMasked = local ? local[0] + '***' : '***';
+  return `${localMasked}@${domain}`;
+}
 
 function shortId(id, n = 12){ const s = String(id||''); return s.slice(-Math.max(4, Math.min(48, n))); }
 
@@ -198,7 +210,7 @@ export default async function handler(req, res) {
           const shipStr = ship.method === 'pickup' ? 'Самовывоз' : `Доставка ${fmtCurrency(ship.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
           const addrShort = ship.address ? String(ship.address).split(',')[0] : '';
           const timeStr = created ? fmtTimeHM(created) : '';
-          const line = `• ${timeStr} — ${total}\n${escapeHtml(o.email || '-') } | ${escapeHtml(o.status || '')}\n${shipStr}${addrShort ? ' — ' + escapeHtml(addrShort) : ''}`;
+          const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${escapeHtml(o.status || '')}\n${shipStr}${addrShort ? ' — ' + escapeHtml(addrShort) : ''}`;
           groupMap.get(dateKey).items.push(line);
         }
         const parts = [];
@@ -253,7 +265,7 @@ export default async function handler(req, res) {
         if (!groupMap.has(dateKey)) groupMap.set(dateKey, { header, items: [] });
         const total = fmtCurrency(o.total || 0, String(o.currency || 'EUR').toUpperCase());
         const timeStr = created ? fmtTimeHM(created) : '';
-        const line = `• ${timeStr} — ${total}\n${escapeHtml(o.email || '-') } | ${escapeHtml(o.status || '')}`;
+        const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${escapeHtml(o.status || '')}`;
         groupMap.get(dateKey).items.push(line);
       }
       const parts = [];
