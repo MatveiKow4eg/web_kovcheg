@@ -300,41 +300,41 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: true });
       }
 
-      await tgAnswerCallbackQuery(cq.id);
-      return res.status(200).json({ ok: true });
-    }
-
-    if (/^orders:next\|/.test(data)) {
-      const m = data.match(/\bb=(\d+)\b/);
-      const mL = data.match(/\bl=(\d+)\b/);
-      const beforeTs = m ? Number(m[1]) : undefined;
-      const limit = mL ? Number(mL[1]) : 10;
-      const orders = await listOrders({ limit, beforeTs });
-      if (!orders.length) {
-        await tgAnswerCallbackQuery(cq.id, 'Больше нет записей');
+      if (/^orders:next\|/.test(data)) {
+        const m = data.match(/\bb=(\d+)\b/);
+        const mL = data.match(/\bl=(\d+)\b/);
+        const beforeTs = m ? Number(m[1]) : undefined;
+        const limit = mL ? Number(mL[1]) : 10;
+        const orders = await listOrders({ limit, beforeTs });
+        if (!orders.length) {
+          await tgAnswerCallbackQuery(cq.id, 'Больше нет записей');
+          return res.status(200).json({ ok: true });
+        }
+        const groupMap = new Map();
+        for (const o of orders) {
+          const created = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
+          const dateKey = created ? fmtDateOnly(created) : 'Без даты';
+          const header = created ? `${fmtDateOnly(created)} (${fmtWeekday(created)})` : 'Без даты';
+          if (!groupMap.has(dateKey)) groupMap.set(dateKey, { header, items: [] });
+          const total = fmtCurrency(o.total || 0, String(o.currency || 'EUR').toUpperCase());
+          const ship = o.shipping || {};
+          const shipStr = ship.method === 'pickup' ? 'Самовывоз' : `Доставка ${fmtCurrency(ship.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
+          const addrShort = ship.address ? String(ship.address).split(',')[0] : '';
+          const timeStr = created ? fmtTimeHM(created) : '';
+          const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${statusBadge(o.status)} ${escapeHtml(o.status || '')}\n${shipStr}${addrShort ? ' — ' + escapeHtml(addrShort) : ''}`;
+          groupMap.get(dateKey).items.push(line);
+        }
+        const parts = [];
+        for (const { header, items } of groupMap.values()) {
+          parts.push(`<b>${header}</b>`);
+          parts.push(items.join('\n\n'));
+        }
+        const textOut = `<b>Последние заказы (${orders.length})</b>\n\n` + parts.join('\n\n');
+        await tgEditMessageText(chatId, msgId, textOut, orderListKeyboard(orders, { limit }));
+        await tgAnswerCallbackQuery(cq.id);
         return res.status(200).json({ ok: true });
       }
-      const groupMap = new Map();
-      for (const o of orders) {
-        const created = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate() : o.createdAt;
-        const dateKey = created ? fmtDateOnly(created) : 'Без даты';
-        const header = created ? `${fmtDateOnly(created)} (${fmtWeekday(created)})` : 'Без даты';
-        if (!groupMap.has(dateKey)) groupMap.set(dateKey, { header, items: [] });
-        const total = fmtCurrency(o.total || 0, String(o.currency || 'EUR').toUpperCase());
-        const ship = o.shipping || {};
-        const shipStr = ship.method === 'pickup' ? 'Самовывоз' : `Доставка ${fmtCurrency(ship.price_eur || 0, String(o.currency || 'EUR').toUpperCase())}`;
-        const addrShort = ship.address ? String(ship.address).split(',')[0] : '';
-        const timeStr = created ? fmtTimeHM(created) : '';
-        const line = `• ${timeStr} — ${total}\n${escapeHtml(maskEmail(o.email))} | ${statusBadge(o.status)} ${escapeHtml(o.status || '')}\n${shipStr}${addrShort ? ' — ' + escapeHtml(addrShort) : ''}`;
-        groupMap.get(dateKey).items.push(line);
-      }
-      const parts = [];
-      for (const { header, items } of groupMap.values()) {
-        parts.push(`<b>${header}</b>`);
-        parts.push(items.join('\n\n'));
-      }
-      const textOut = `<b>Последние заказы (${orders.length})</b>\n\n` + parts.join('\n\n');
-      await tgEditMessageText(chatId, msgId, textOut, orderListKeyboard(orders, { limit }));
+
       await tgAnswerCallbackQuery(cq.id);
       return res.status(200).json({ ok: true });
     }
