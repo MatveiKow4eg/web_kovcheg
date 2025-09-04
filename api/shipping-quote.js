@@ -1,14 +1,12 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore/lite";
+import { initializeApp as initAdminApp, cert, getApps } from "firebase-admin/app";
+import { getFirestore as getAdminFirestore, FieldValue } from "firebase-admin/firestore";
 
-// Firebase (server-side via env)
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Firebase Admin (server-side)
+const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || "{}");
+if (!getApps().length) {
+  initAdminApp({ credential: cert(sa), projectId: sa.project_id || process.env.FIREBASE_PROJECT_ID });
+}
+const db = getAdminFirestore();
 
 // Environment
 const WAREHOUSE_LAT = parseFloat(process.env.WAREHOUSE_LAT || "");
@@ -101,10 +99,10 @@ async function geocodeAddress(address) {
 
   // Try cache by original normalized key first
   const normalizedId = normalizeAddressId(address);
-  const cacheRef = doc(db, "geocache", normalizedId);
+  const cacheRef = db.collection("geocache").doc(normalizedId);
   try {
-    const snap = await getDoc(cacheRef);
-    if (snap.exists()) {
+    const snap = await cacheRef.get();
+    if (snap.exists) {
       const data = snap.data();
       if (data?.lat && data?.lon) {
         return { lat: Number(data.lat), lon: Number(data.lon), provider: data.provider || GEOCODER_PROVIDER, cached: true, warnings };
@@ -172,7 +170,7 @@ async function geocodeAddress(address) {
   }
 
   try {
-    await setDoc(cacheRef, {
+    await cacheRef.set({
       address: String(address),
       normalized: normalizedId,
       lat,
@@ -188,10 +186,10 @@ async function geocodeAddress(address) {
 }
 
 async function loadShippingConfig() {
-  const ref = doc(db, "shipping_config", "default");
+  const ref = db.collection("shipping_config").doc("default");
   try {
-    const snap = await getDoc(ref);
-    const data = snap.exists() ? snap.data() : {};
+    const snap = await ref.get();
+    const data = snap.exists ? snap.data() : {};
     return {
       base_eur: toNumber(data.base_eur, 2),
       per_km_eur: toNumber(data.per_km_eur, 0.5),
@@ -249,8 +247,8 @@ async function resolveItemsWeight(items) {
     }
     if (!id) { warnings.push("item_without_id"); continue; }
     try {
-      const snap = await getDoc(doc(db, "products", id));
-      if (!snap.exists()) {
+      const snap = await db.collection("products").doc(id).get();
+      if (!snap.exists) {
         warnings.push(`product_not_found:${id}`);
         continue;
       }
