@@ -69,6 +69,7 @@ export default async function handler(req, res) {
         distance_km: md.shipping_distance_km ? Number(md.shipping_distance_km) : null,
         total_weight_kg: md.shipping_weight_kg ? Number(md.shipping_weight_kg) : null,
       };
+      const itemIds = typeof md.item_ids === 'string' ? md.item_ids.split(',').map(s=>s.trim()).filter(Boolean) : [];
 
       // Сохраняем заказ в Firestore (admin SDK)
       try {
@@ -82,6 +83,7 @@ export default async function handler(req, res) {
           createdAt: FieldValue.serverTimestamp(),
           status: "paid",
           shipping,
+          item_ids: itemIds,
         });
       } catch (e) {
         console.error("Firestore write error:", e);
