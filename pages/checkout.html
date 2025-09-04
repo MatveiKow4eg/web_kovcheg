@@ -352,9 +352,10 @@
     updatePayState();
 
     // Warnings (e.g., missing weights)
-    if (Array.isArray(quote.warnings) && quote.warnings.length){
+    const warnList = (quote.warnings || []).filter(w => w !== 'weight_tier_pricing');
+    if (warnList.length){
       warningsEl.style.display = 'block';
-      warningsEl.innerHTML = '<b>Примечания:</b> ' + quote.warnings.map(escapeHtml).join(', ');
+      warningsEl.innerHTML = '<b>Примечания:</b> ' + warnList.map(escapeHtml).join(', ');
     } else {
       warningsEl.style.display = 'none';
     }
