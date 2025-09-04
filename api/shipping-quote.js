@@ -359,15 +359,6 @@ export default async function handler(req, res) {
       eta_days: 2,
     });
 
-    const expressPrice = Math.max(standardPrice, basePrice) * cfg.express_multiplier;
-    const expressCapped = Math.min(CAP_EUR, expressPrice);
-    options.push({
-      id: "express",
-      label: "Экспресс",
-      price_eur: roundMoneyEUR(expressCapped),
-      eta_days: 1,
-    });
-
     if (cfg.pickup_enabled) {
       options.push({ id: "pickup", label: "Самовывоз", price_eur: 0, eta_days: 0 });
     }
