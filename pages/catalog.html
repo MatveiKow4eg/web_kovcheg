@@ -33,57 +33,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;900&display=swap&subset=cyrillic" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-<style>
-    /* Auto-scrolling header banner */
-    .auto-scroll-header {
-      position: relative;
-      overflow: hidden;
-      padding: 18px 0;
-      border-top: 1px solid #eee;
-      border-bottom: 1px solid #eee;
-      background: #fff;
-      -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-      mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-    }
-    .auto-scroll-track {
-      display: flex;
-      width: max-content;
-      animation: autoMarquee 40s linear infinite;
-    }
-    .auto-scroll-seq {
-      display: inline-flex;
-      align-items: center;
-      gap: clamp(18px, 3vw, 36px);
-      padding-right: clamp(24px, 5vw, 60px);
-      flex-shrink: 0;
-    }
-    .auto-item {
-      font-family: 'Inter', Arial, sans-serif;
-      font-weight: 900;
-      letter-spacing: 1px;
-      white-space: nowrap;
-      font-size: clamp(28px, 8vw, 110px);
-      color: #111;
-      line-height: 1.05;
-    }
-    .auto-dot {
-      font-weight: 900;
-      color: #ff7847;
-      font-size: clamp(28px, 8vw, 110px);
-      line-height: 1;
-    }
-    @keyframes autoMarquee {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    @media (max-width: 700px) {
-      .auto-scroll-header { padding: 10px 0; }
-      .auto-scroll-seq { gap: clamp(12px, 4vw, 20px); padding-right: 32px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .auto-scroll-track { animation: none; }
-    }
-  </style>
 </head>
 <body>
 
@@ -120,12 +69,18 @@
         <div class="slideshow-viewport">
           <div class="slide is-active">
             <a href="/collections/best-sellers">
-              <img src="https://img-va.myshopline.com/image/store/1710916271890/5-2.jpeg?w=1920&h=800" alt="">
+              <picture>
+                <source media="(max-width: 700px)" srcset="https://img-va.myshopline.com/image/store/1710916271890/5-3--1.jpeg?w=750&h=1000">
+                <img src="https://img-va.myshopline.com/image/store/1710916271890/5-2.jpeg?w=1920&h=800" alt="">
+              </picture>
             </a>
           </div>
           <div class="slide">
             <a href="/collections/gods-plan-my-plan">
-              <img src="https://img-va.myshopline.com/image/store/1710916271890/4468f17ae0c1d46c1e94609d53fa47fd.jpeg?w=1920&h=800" alt="">
+              <picture>
+                <source media="(max-width: 700px)" srcset="https://img-va.myshopline.com/image/store/1710916271890/06b6369242d989c6fd3b93d6752c5bb1.jpeg?w=750&h=1000">
+                <img src="https://img-va.myshopline.com/image/store/1710916271890/4468f17ae0c1d46c1e94609d53fa47fd.jpeg?w=1920&h=800" alt="">
+              </picture>
             </a>
           </div>
         </div>
@@ -137,22 +92,7 @@
           <button class="dot is-active" aria-label="Слайд 1"></button>
           <button class="dot" aria-label="Слайд 2"></button>
         </div>
-        <style>
-          .section-slideshow{position:relative;width:100%;overflow:hidden;margin:0 0 20px 0;}
-          .section-slideshow .slideshow-viewport{position:relative;width:100%;height:clamp(200px,42vw,640px);background:#f4f4f4;}
-          .section-slideshow .slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;}
-          .section-slideshow .slide.is-active{opacity:1;}
-          .section-slideshow img{width:100%;height:100%;object-fit:cover;display:block;}
-          .slideshow-dots{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:8px;}
-          .slideshow-dots .dot{width:8px;height:8px;border-radius:50%;background:#d0d0d0;border:none;padding:0;cursor:pointer;}
-          .slideshow-dots .dot.is-active{background:#111;}
-          .slideshow-nav{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;pointer-events:none;}
-          .slideshow-nav .nav-btn{pointer-events:auto;background:rgba(0,0,0,.42);color:#fff;border:0;width:42px;height:42px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s ease;}
-          .slideshow-nav .nav-btn:hover{background:rgba(0,0,0,.6);}
-          .slideshow-nav .nav-btn:focus{outline:2px solid #fff;outline-offset:2px;}
-          @media (max-width:700px){.section-slideshow .slideshow-viewport{height:56vw;}.slideshow-nav .nav-btn{width:36px;height:36px;}}
-        </style>
-        <script>
+                <script>
           (()=>{const root=document.currentScript.closest('.section-slideshow');const slides=[...root.querySelectorAll('.slide')];const dots=[...root.querySelectorAll('.dot')];const prevBtn=root.querySelector('.nav-btn.prev');const nextBtn=root.querySelector('.nav-btn.next');let i=0;let timer=null;const set=n=>{slides[i].classList.remove('is-active');dots[i].classList.remove('is-active');i=(n+slides.length)%slides.length;slides[i].classList.add('is-active');dots[i].classList.add('is-active');};const next=()=>set(i+1);const prev=()=>set(i-1);const play=()=>{clearInterval(timer);timer=setInterval(next,7000)};prevBtn&&prevBtn.addEventListener('click',()=>{prev();play();});nextBtn&&nextBtn.addEventListener('click',()=>{next();play();});dots.forEach((d,idx)=>d.addEventListener('click',()=>{set(idx);play();}));play();})();
         </script>
       </section>
@@ -193,10 +133,10 @@
           </div>
         </div>
       </section>
-      -->
+    -->
       <section class="catalog-section">
         <h1 class="section-title"></h1>
-        <div class="catalog-grid" id="catalog"></div>
+        <div class="catalog-grid" id="catalog" data-render-by="catalog"></div>
       </section>
     </main>
   </div>
@@ -263,10 +203,10 @@
         </form>
 
         <!-- скрытый iframe -->
-        <iframe name="_zcSignup" id="zc_iframe" style="display:none;"></iframe>
+        <iframe name="_zcSignup" id="zc_iframe"></iframe>
 
         <!-- локальное сообщение -->
-        <div id="localSignupSuccess" style="display:none; margin-top:10px;">
+        <div id="localSignupSuccess">
           Спасибо! Проверь почту и подтверди подписку.
         </div>
       </div>
@@ -274,7 +214,7 @@
   </div>
 
   <!-- Текст политики конфиденциальности -->
-  <p class="privacy-text" style="margin-top:10px;">
+  <p class="privacy-text">
     Подписываясь, ты соглашаешься с <a href="#">политикой конфиденциальности</a>.
   </p>
 </div>

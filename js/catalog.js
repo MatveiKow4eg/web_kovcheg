@@ -56,23 +56,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="product-image-container">
         <img class="main-img" src="${product.img || 'optimized_img/main-400.webp'}" alt="${product.name}">
         <img class="hover-img" src="${product.hoverImg || product.img || 'optimized_img/main-400.webp'}" alt="${product.name}">
+        <button class="buy-btn image-buy-btn" data-id="${product.id}">Добавить в корзину</button>
       </div>
       <div class="card-content">
-        <h4>${product.name}</h4>
         <p>${product.description}</p>
         <p class="price">${product.price} €</p>
-        <button class="buy-btn" data-id="${product.id}">Купить</button>
       </div>
     `;
 
-    const btn = card.querySelector('.buy-btn');
+    const btn = card.querySelector('.image-buy-btn');
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      addToCart(product);
+      if (window.addToCart) {
+        window.addToCart(product);
+      } else {
+        addToCart(product);
+      }
+    });
+
+    const imgContainer = card.querySelector('.product-image-container');
+    imgContainer.style.cursor = 'pointer';
+    imgContainer.addEventListener('click', () => {
+      window.location.href = `product.html?id=${encodeURIComponent(product.id)}`;
     });
 
     catalog.appendChild(card);
   });
 
-  updateCartIcon(getCart());
+  if (window.renderCartWidget) {
+    window.renderCartWidget();
+  } else {
+    updateCartIcon(getCart());
+  }
 });

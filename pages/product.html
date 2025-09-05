@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Товар | Ковчег</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/favicon_io/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="/public/favicon_io/favicon.ico">
+  <link rel="apple-touch-icon" href="/public/favicon_io/apple-touch-icon.png">
+  <link rel="manifest" href="/public/favicon_io/site.webmanifest">
+  <link rel="stylesheet" href="/css/style-index.css" />
+  <link rel="stylesheet" href="/css/catalog.css" />
+  <style>
+    /* Product page layout */
+    .product-page { max-width: 1200px; margin: 0 auto; padding: 24px; box-sizing: border-box; }
+    .product-wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 28px; align-items: start; }
+    .product-media { position: relative; width: 100%; background: #f5f5f5; border-radius: 12px; overflow: hidden; }
+    .product-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .product-info { display: grid; gap: 14px; }
+    .product-title { font-family: 'Inter', Arial, sans-serif; font-weight: 800; font-size: 28px; margin: 0; color: #111; }
+    .product-price { font-size: 22px; font-weight: 600; color: #111; }
+    .product-desc { font-size: 16px; color: #444; line-height: 1.55; }
+    .product-actions { display: flex; gap: 12px; align-items: center; }
+    .btn-primary { padding: 12px 20px; border: 1px solid #111; background: #111; color: #fff; border-radius: 10px; cursor: pointer; font-weight: 700; }
+    .btn-primary:hover { background: #222; }
+    .btn-secondary { padding: 12px 20px; border: 1px solid #ddd; background: #fff; color: #111; border-radius: 10px; cursor: pointer; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; }
+    .thumbs { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; margin-top: 10px; }
+    .thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid transparent; }
+    .thumbs img.active { border-color: #111; }
+
+    @media (max-width: 900px) {
+      .product-wrap { grid-template-columns: 1fr; gap: 16px; }
+      .product-title { font-size: 22px; }
+      .product-price { font-size: 20px; }
+      .product-desc { font-size: 15px; }
+      .product-page { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-shell">
+    <header class="main-header">
+      <div class="header-container">
+        <div class="main-logo">
+          <img src="/public/optimized_img/index_img/logo/logo_black-40.webp" alt="Ковчег" />
+        </div>
+        <nav class="main-nav">
+          <a href="index.html">Главная</a>
+          <a href="theme.html">Тема</a>
+          <a href="about.html">О лагере</a>
+          <a href="gallery.html">Галерея</a>
+          <a href="catalog.html" class="active">Мерч</a>
+        </nav>
+        <button class="burger" aria-label="Открыть меню"><span></span><span></span><span></span></button>
+      </div>
+    </header>
+
+    <main class="product-page">
+      <div id="product" class="product-wrap" aria-busy="true"></div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { db } from '/js/firebase.js';
+    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+    function getParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    function renderNotFound() {
+      const root = document.getElementById('product');
+      root.setAttribute('aria-busy', 'false');
+      root.innerHTML = `<div style="padding:20px;">Товар не найден. <a href="catalog.html">Вернуться в каталог</a></div>`;
+    }
+
+    function currency(val) { try { return `${Number(val).toFixed(2)} €`; } catch { return `${val} €`; } }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const id = getParam('id');
+      if (!id) return renderNotFound();
+
+      try {
+        const ref = doc(db, 'products', id);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) return renderNotFound();
+        const p = { id, ...snap.data() };
+
+        const root = document.getElementById('product');
+        root.setAttribute('aria-busy', 'false');
+        const mainImg = p.img || '/public/placeholder.webp';
+        const hoverImg = p.hoverImg || mainImg;
+
+        root.innerHTML = `
+          <div class="product-media">
+            <img id="mainImage" src="${mainImg}" alt="${p.name || ''}">
+            <div class="thumbs">
+              <img class="active" src="${mainImg}" alt="${p.name || ''} 1">
+              <img src="${hoverImg}" alt="${p.name || ''} 2">
+            </div>
+          </div>
+          <div class="product-info">
+            <h1 class="product-title">${p.name || ''}</h1>
+            <div class="product-price">${currency(p.price)}</div>
+            <div class="product-desc">${p.description || ''}</div>
+            <div class="product-actions">
+              <button id="addToCart" class="btn-primary">Добавить в корзину</button>
+              <a href="catalog.html" class="btn-secondary">← В каталог</a>
+            </div>
+          </div>
+        `;
+
+        // thumbs behavior
+        const mainEl = document.getElementById('mainImage');
+        document.querySelectorAll('.thumbs img').forEach(img => {
+          img.addEventListener('click', () => {
+            document.querySelectorAll('.thumbs img').forEach(i => i.classList.remove('active'));
+            img.classList.add('active');
+            mainEl.src = img.src;
+          });
+        });
+
+        const btn = document.getElementById('addToCart');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const product = { id: p.id, name: p.name, price: p.price, img: p.img, hoverImg: p.hoverImg, description: p.description };
+          if (window.addToCart) window.addToCart(product);
+        });
+      } catch (e) {
+        console.error(e);
+        renderNotFound();
+      }
+    });
+  </script>
+
+  <script type="module" src="/js/cart.js"></script>
+</body>
+</html>

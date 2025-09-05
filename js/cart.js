@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   createCartWidget();
 
   const catalog = document.getElementById('catalog');
-  if (catalog) {
+  if (catalog && catalog.dataset.renderBy === 'cart') {
     try {
       const products = await getProducts();
       catalog.innerHTML = '';
@@ -187,7 +187,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <img class="hover-img" src="${product.hoverImg || product.img || 'optimized_img/main-400.webp'}" alt="${product.name}">
           </div>
           <div class="card-content">
-            <h4>${product.name}</h4>
             <p>${product.description}</p>
             <p class="price">${product.price} €</p>
             <button class="buy-btn" data-id="${product.id}">Добавить в корзину</button>
