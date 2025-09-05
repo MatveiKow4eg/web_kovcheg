@@ -465,11 +465,11 @@
     padding: 12px;
   }
 
-/* Планшеты - 3 в ряд */
+/* Планшеты - 2 в ряд */
 @media (max-width: 1200px) {
   .catalog-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
   }
   
   .catalog-section {
@@ -613,3 +613,32 @@
   transition-duration: 0.2s;
   transition-timing-function: ease;
 }
+
+/* Minimal catalog aesthetic overrides */
+.catalog-section { width: 100%; max-width: 100%; margin: 0; padding: 32px 50px; box-sizing: border-box; }
+.section-title { font-family: 'Inter', Arial, sans-serif; font-weight: 900; font-size: 44px; color: #111; text-align: center; letter-spacing: -0.5px; margin: 0 0 10px; }
+.section-subtitle { font-family: 'Inter', Arial, sans-serif; font-size: 16px; color: #555; text-align: center; margin: 0 0 40px; }
+.catalog-grid { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 24px; }
+.product-card { background: transparent; border-radius: 0; box-shadow: none; transform: none !important; }
+.product-card:hover { transform: none; box-shadow: none; }
+.product-image-container { background: #f2f2f2; }
+.product-image-container img { transition: opacity 0.3s ease, transform 0.3s ease; }
+.product-card:hover .product-image-container img.main-img { transform: scale(1.03); }
+.product-card .card-content { padding: 12px 0 0; }
+.product-card .card-content h4 { font-size: 15px; font-weight: 700; color: #111; margin: 10px 0 6px; min-height: auto; -webkit-line-clamp: 2; }
+.product-card .card-content p { color: #666; font-size: 14px; margin: 0 0 10px; -webkit-line-clamp: 2; }
+.product-card .price { font-weight: 700; color: #111; margin-top: 4px; }
+.buy-btn { width: auto; padding: 10px 14px; border-radius: 8px; background: transparent; color: #111; border: 1px solid #ddd; text-transform: none; letter-spacing: 0; font-weight: 600; }
+.buy-btn:hover { background: #111; color: #fff; border-color: #111; }
+.product-badge { display: none; }
+
+@media (max-width: 768px) {
+  .catalog-section { padding: 36px 12px; }
+  .section-title { font-size: 28px; }
+  .section-subtitle { font-size: 14px; margin-bottom: 24px; }
+  .product-card .card-content { padding-top: 8px; }
+  .buy-btn { width: 100%; }
+}
+
+/* Fix right padding cut by 100vw containers on this page */
+html, body, .main-shell { width: 100% !important; max-width: 100% !important; }
