@@ -64,12 +64,8 @@
   opacity: 0;
   z-index: 2;
 }
-.product-card:hover .hover-img {
-  opacity: 1;
-}
-.product-card:hover .main-img {
-  opacity: 0;
-}
+/* moved to desktop-only hover media query */
+/* moved to desktop-only hover media query */
 /* кнопка внизу изображения, показывается при ховере */
 .product-image-container .image-buy-btn {
   position: absolute;
@@ -821,4 +817,10 @@ body { padding-top: 84px !important; }
   #cart-widget { bottom: 22px; right: 22px; }
   #cart-icon { padding: 14px 16px; font-size: 18px; border-radius: 999px; box-shadow: 0 8px 16px rgba(0,0,0,0.24); }
   #cart-count { font-size: 14px; padding: 4px 8px; }
+}
+
+/* desktop-only image hover swap */
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover .hover-img { opacity: 1; }
+  .product-card:hover .main-img { opacity: 0; }
 }
