@@ -81,15 +81,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
   sectionEl.insertBefore(header, catalog);
 
-  const pageSize = 4;
-  let page = 0;
-  const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
   const prevBtn = header.querySelector('.prev');
   const nextBtn = header.querySelector('.next');
   function updateArrows(){
-    // Всегда показываем стрелки; используем циклическую пагинацию
-    prevBtn.style.display = '';
-    nextBtn.style.display = '';
+    const maxScroll = catalog.scrollWidth - catalog.clientWidth;
+    const left = catalog.scrollLeft || 0;
+    prevBtn.disabled = left <= 1;
+    nextBtn.disabled = left >= maxScroll - 1;
   }
 
   function buildCard(product){
@@ -121,25 +119,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     return card;
   }
 
-  function renderPage(){
+  function renderAll(){
     catalog.innerHTML = '';
-    const start = page * pageSize;
-    const items = products.slice(start, start + pageSize);
-    items.forEach(p => catalog.appendChild(buildCard(p)));
-    updateArrows();
+    products.forEach(p => catalog.appendChild(buildCard(p)));
     if (window.renderCartWidget) window.renderCartWidget(); else updateCartIcon(getCart());
+    requestAnimationFrame(updateArrows);
+  }
+
+  function scrollStep(sign = 1) {
+    const firstCard = catalog.querySelector('.product-card');
+    if (!firstCard) return;
+    const styles = getComputedStyle(catalog);
+    const gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
+    const step = Math.round(firstCard.getBoundingClientRect().width + gap);
+    catalog.scrollBy({ left: sign * step, behavior: 'smooth' });
   }
 
   prevBtn.addEventListener('click', () => {
-    page = (page - 1 + totalPages) % totalPages;
-    renderPage();
+    scrollStep(-1);
   });
   nextBtn.addEventListener('click', () => {
-    page = (page + 1) % totalPages;
-    renderPage();
+    scrollStep(1);
   });
 
-  renderPage();
+  catalog.addEventListener('scroll', () => {
+    window.requestAnimationFrame(updateArrows);
+  });
+  window.addEventListener('resize', updateArrows);
 
-  // moved into renderPage()
+  renderAll();
+
+  // moved into renderAll()
 });
