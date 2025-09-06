@@ -107,11 +107,6 @@
 /* swipe helper: manual toggle on mobile */
 .product-image-container.show-hover .hover-img { opacity: 1; }
 .product-image-container.show-hover .main-img { opacity: 0; }
-/* dots indicator */
-.slider-dots { position:absolute; left:50%; bottom:8px; transform:translateX(-50%); display:none; gap:6px; z-index:4; }
-.slider-dots .dot { width:6px; height:6px; border-radius:50%; background: rgba(17,17,17,0.35); }
-.slider-dots .dot.is-active { background:#111; }
-@media (max-width: 768px) { .slider-dots { display:flex; } }
 
 /* скрыть старую кнопку, если где-то осталась */
 .product-card .card-content .buy-btn { display: none !important; }

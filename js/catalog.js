@@ -77,46 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const imgContainer = card.querySelector('.product-image-container');
     imgContainer.style.cursor = 'pointer';
 
-    // Add swipe dots on mobile
-    const dots = document.createElement('div');
-    dots.className = 'slider-dots';
-    dots.innerHTML = '<span class="dot is-active"></span><span class="dot"></span>';
-    imgContainer.appendChild(dots);
-
-    // Touch swipe toggle between main and hover image on mobile
-    let startX = 0, deltaX = 0, swiping = false, altShown = false;
-    imgContainer.addEventListener('touchstart', (e) => {
-      if (e.touches.length !== 1) return;
-      startX = e.touches[0].clientX;
-      deltaX = 0;
-      swiping = true;
-    }, { passive: true });
-
-    imgContainer.addEventListener('touchmove', (e) => {
-      if (!swiping) return;
-      deltaX = e.touches[0].clientX - startX;
-    }, { passive: true });
-
-    imgContainer.addEventListener('touchend', () => {
-      if (!swiping) return;
-      swiping = false;
-      if (Math.abs(deltaX) > 30) {
-        altShown = !altShown;
-        imgContainer.classList.toggle('show-hover', altShown);
-        const dotEls = dots.querySelectorAll('.dot');
-        if (dotEls.length >= 2) {
-          dotEls[0].classList.toggle('is-active', !altShown);
-          dotEls[1].classList.toggle('is-active', altShown);
-        }
-        // prevent click navigation after swipe
-        imgContainer.dataset.swiped = '1';
-        setTimeout(() => { delete imgContainer.dataset.swiped; }, 60);
-      }
-      deltaX = 0;
-    });
-
+    
+    
     imgContainer.addEventListener('click', () => {
-      if (imgContainer.dataset.swiped === '1') return;
       window.location.href = `product.html?id=${encodeURIComponent(product.id)}`;
     });
 
