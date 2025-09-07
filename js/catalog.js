@@ -62,6 +62,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     .cat-arrow polyline{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
     .cat-arrow:focus-visible{outline:2px solid #111;outline-offset:2px}
   `;
+  // hide scrollbars for desktop carousel
+  catStyle.textContent += `
+    .is-carousel::-webkit-scrollbar{display:none}
+    .is-carousel{scrollbar-width:none;-ms-overflow-style:none}
+  `;
   document.head.appendChild(catStyle);
 
   // Build header with title and arrows
@@ -123,6 +128,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     catalog.innerHTML = '';
     products.forEach(p => catalog.appendChild(buildCard(p)));
     if (window.renderCartWidget) window.renderCartWidget(); else updateCartIcon(getCart());
+    applyLayout();
+  }
+
+  function applyLayout(){
+    const isDesktop = window.matchMedia('(min-width: 769px)').matches;
+    const needCarousel = isDesktop && products.length > 4;
+    if (needCarousel) {
+      catalog.classList.add('is-carousel');
+      catalog.style.display = 'flex';
+      catalog.style.overflowX = 'auto';
+      catalog.style.overflowY = 'hidden';
+      catalog.style.gap = '24px';
+      catalog.style.scrollSnapType = 'x mandatory';
+      catalog.style.padding = '6px 8px';
+      catalog.style.scrollPaddingLeft = '8px';
+      catalog.querySelectorAll('.product-card').forEach((card) => {
+        card.style.flex = '0 0 calc((100% - 72px)/4)';
+        card.style.maxWidth = 'calc((100% - 72px)/4)';
+        card.style.minWidth = 'calc((100% - 72px)/4)';
+        card.style.scrollSnapAlign = 'start';
+      });
+    } else {
+      // revert to CSS grid/flex from stylesheets (mobile keeps its horizontal scroll)
+      catalog.removeAttribute('style');
+      catalog.classList.remove('is-carousel');
+      catalog.querySelectorAll('.product-card').forEach((card) => {
+        card.style.flex = '';
+        card.style.maxWidth = '';
+        card.style.minWidth = '';
+        card.style.scrollSnapAlign = '';
+      });
+    }
     requestAnimationFrame(updateArrows);
   }
 
@@ -145,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   catalog.addEventListener('scroll', () => {
     window.requestAnimationFrame(updateArrows);
   });
-  window.addEventListener('resize', updateArrows);
+  window.addEventListener('resize', applyLayout);
 
   renderAll();
 
