@@ -1,11 +1,17 @@
 import { db } from './firebase.js';
-import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+import { collection, getDocs, query, orderBy, limit, startAfter } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-// Получаем товары из Firestore
-async function getProducts() {
+// Получаем товары из Firestore постранично
+async function getProductsPage(pageSize = 12, cursor = null) {
   const productsCol = collection(db, 'products');
-  const snapshot = await getDocs(productsCol);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  let q = query(productsCol, orderBy('__name__'), limit(pageSize));
+  if (cursor) {
+    q = query(productsCol, orderBy('__name__'), startAfter(cursor), limit(pageSize));
+  }
+  const snapshot = await getDocs(q);
+  const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const lastVisible = snapshot.docs[snapshot.docs.length - 1] || cursor;
+  return { items, lastVisible };
 }
 
 // Работа с корзиной в localStorage
@@ -46,7 +52,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Очистка каталога перед рендером
   catalog.innerHTML = '';
 
-  const products = await getProducts();
+  // Состояние пагинации
+  let products = [];
+  let lastDoc = null;
+  const PAGE_SIZE = 12; // уменьшите/увеличьте при необходимости
 
   // Inject minimal styles for header and arrows
   const catStyle = document.createElement('style');
@@ -62,10 +71,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     .cat-arrow polyline{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
     .cat-arrow:focus-visible{outline:2px solid #111;outline-offset:2px}
   `;
-  // hide scrollbars for desktop carousel
+  // hide scrollbars for desktop carousel + loader
   catStyle.textContent += `
     .is-carousel::-webkit-scrollbar{display:none}
     .is-carousel{scrollbar-width:none;-ms-overflow-style:none}
+    .catalog-loader{display:flex;align-items:center;justify-content:center;min-height:360px;width:100%}
+    .catalog-loader .logo{width:96px;height:96px;animation:catalog-spin 1.2s linear infinite;opacity:1}
+    @keyframes catalog-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
   `;
   document.head.appendChild(catStyle);
 
@@ -86,6 +98,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   `;
   sectionEl.insertBefore(header, catalog);
 
+  // Логотип загрузки до получения данных
+  const loader = document.createElement('div');
+  loader.className = 'catalog-loader';
+  loader.innerHTML = `<img class="logo" src="/public/optimized_img/index_img/logo/logo_black-40.webp" alt="Загрузка..." />`;
+  catalog.appendChild(loader);
+
   const prevBtn = header.querySelector('.prev');
   const nextBtn = header.querySelector('.next');
   function updateArrows(){
@@ -100,8 +118,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     card.className = 'product-card';
     card.innerHTML = `
       <div class="product-image-container">
-        <img class="main-img" src="${product.img || 'optimized_img/main-400.webp'}" alt="${product.name}">
-        <img class="hover-img" src="${product.hoverImg || product.img || 'optimized_img/main-400.webp'}" alt="${product.name}">
+        <img class="main-img" src="${product.img || 'optimized_img/main-400.webp'}" alt="${product.name}" loading="lazy" decoding="async" fetchpriority="low">
+        <img class="hover-img" src="${product.hoverImg || product.img || 'optimized_img/main-400.webp'}" alt="${product.name}" loading="lazy" decoding="async" fetchpriority="low">
         <button class="buy-btn image-buy-btn" data-id="${product.id}">Добавить в корзину</button>
       </div>
       <div class="card-content">
@@ -172,6 +190,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     catalog.scrollBy({ left: sign * step, behavior: 'smooth' });
   }
 
+  async function loadNextPage() {
+    const { items, lastVisible } = await getProductsPage(PAGE_SIZE, lastDoc);
+    lastDoc = lastVisible;
+    products.push(...items);
+    renderAll();
+  }
+
   prevBtn.addEventListener('click', () => {
     scrollStep(-1);
   });
@@ -184,7 +209,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   window.addEventListener('resize', applyLayout);
 
-  renderAll();
+  // Первая страница каталога
+  try {
+    await loadNextPage();
+  } catch (e) {
+    console.error('Ошибка загрузки каталога', e);
+    catalog.innerHTML = '<div class="catalog-loader">Не удалось загрузить каталог</div>';
+  } finally {
+    if (typeof loader !== 'undefined' && loader && loader.parentNode) {
+      try { loader.remove(); } catch(_) { loader.parentNode.removeChild(loader); }
+    }
+  }
 
   // moved into renderAll()
 });
