@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     .is-carousel::-webkit-scrollbar{display:none}
     .is-carousel{scrollbar-width:none;-ms-overflow-style:none}
     .catalog-loader{display:flex;align-items:center;justify-content:center;min-height:360px;width:100%}
-    .catalog-loader .logo{width:96px;height:96px;animation:catalog-spin 1.2s linear infinite;opacity:1}
+    .catalog-loader .spinner{width:72px;height:72px;border:6px solid rgba(0,0,0,.12);border-top-color:#55836d;border-radius:50%;animation:catalog-spin .8s linear infinite}
     @keyframes catalog-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
   `;
   document.head.appendChild(catStyle);
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Логотип загрузки до получения данных
   const loader = document.createElement('div');
   loader.className = 'catalog-loader';
-  loader.innerHTML = `<img class="logo" src="/public/optimized_img/index_img/logo/logo_black-40.webp" alt="Загрузка..." />`;
+  loader.innerHTML = `<div class=\"spinner\" role=\"status\" aria-label=\"Загрузка...\"></div>`;
   catalog.appendChild(loader);
 
   const prevBtn = header.querySelector('.prev');
@@ -117,15 +117,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const card = document.createElement('div');
     card.className = 'product-card';
     card.innerHTML = `
-      <div class="product-image-container">
-        <img class="main-img" src="${product.img || 'optimized_img/main-400.webp'}" alt="${product.name}" loading="lazy" decoding="async" fetchpriority="low">
-        <img class="hover-img" src="${product.hoverImg || product.img || 'optimized_img/main-400.webp'}" alt="${product.name}" loading="lazy" decoding="async" fetchpriority="low">
-        <button class="buy-btn image-buy-btn" data-id="${product.id}">Добавить в корзину</button>
+      <div class=\"product-image-container\">
+        <img class=\"main-img\" src=\"${product.img || 'optimized_img/main-400.webp'}\" alt=\"${product.name}\" loading=\"lazy\" decoding=\"async\" fetchpriority=\"low\">
+        <img class=\"hover-img\" src=\"${product.hoverImg || product.img || 'optimized_img/main-400.webp'}\" alt=\"${product.name}\" loading=\"lazy\" decoding=\"async\" fetchpriority=\"low\">
+        <button class=\"buy-btn image-buy-btn\" data-id=\"${product.id}\">Добавить в корзину</button>
       </div>
-      <div class="card-content">
-        <p>${product.description}</p>
-        <p class="price">${product.price} €</p>
-      </div>`;
+      <div class=\"card-content\">\n        <p>${product.description}</p>\n        <p class=\"price\">${product.price} €</p>\n      </div>`;
 
     const btn = card.querySelector('.image-buy-btn');
     btn.addEventListener('click', (e) => {
